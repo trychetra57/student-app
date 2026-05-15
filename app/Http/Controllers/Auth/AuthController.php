@@ -10,14 +10,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLogin()
-    {
-        if (Auth::check()) {
-            return redirect()->route('students.index');
-        }
-        return view('auth.login');
-    }
-
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -27,23 +19,22 @@ class AuthController extends Controller
 
         $credentials['is_active'] = true;
 
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            return back()->withErrors([
-                'email' => 'Invalid email or password, or account is inactive.',
-            ])->onlyInput('email');
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid email or password, or account is inactive.',
+            ], 401);
         }
 
-        $request->session()->regenerate();
+        $user = Auth::user();
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        return redirect()->intended(route('students.index'))->with('success', 'Welcome back!');
-    }
-
-    public function showRegister()
-    {
-        if (Auth::check()) {
-            return redirect()->route('students.index');
-        }
-        return view('auth.register');
+        return response()->json([
+            'success' => true,
+            'message' => 'Welcome back!',
+            'user' => $user,
+            'token' => $token,
+        ]);
     }
 
     public function register(Request $request)
@@ -60,22 +51,28 @@ class AuthController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => $request->password,
+            'password' => Hash::make($request->password),
             'role' => $role,
             'is_active' => true,
         ]);
 
-        Auth::login($user);
+        $token = $user->createToken('auth_token')->plainTextToken;
 
-        return redirect()->route('students.index')->with('success', 'Account created successfully!');
+        return response()->json([
+            'success' => true,
+            'message' => 'Account created successfully!',
+            'user' => $user,
+            'token' => $token,
+        ], 201);
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $request->user()->currentAccessToken()->delete();
 
-        return redirect()->route('login')->with('success', 'Logged out successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Logged out successfully.',
+        ]);
     }
 }

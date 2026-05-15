@@ -8,11 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
+
 class StudentController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Student::query();
+        $query = Student::query()->with('documents');
 
         // Search functionality
         if ($request->has('search') && !empty($request->search)) {
@@ -34,40 +35,51 @@ class StudentController extends Controller
         // Sorting
         $sort = $request->get('sort', 'name');
         $direction = $request->get('direction', 'asc');
-        $query = $query->sort($sort, $direction);
+        
+        // Handle sorting manually if no macro exists
+        $query->orderBy($sort, $direction);
 
         // Pagination
         $perPage = $request->get('per_page', 10);
         $students = $query->paginate($perPage)->withQueryString();
 
-        return view('index', compact('students'));
+        return response()->json([
+            'success' => true,
+            'data' => $students
+        ]);
     }
 
     public function dashboard()
     {
         $stats = [
             'total_students' => Student::count(),
-            'active_students' => Student::active()->count(),
-            'inactive_students' => Student::inactive()->count(),
-            'graduated_students' => Student::graduated()->count(),
+            'active_students' => Student::where('status', 'active')->count(),
+            'inactive_students' => Student::where('status', 'inactive')->count(),
+            'graduated_students' => Student::where('status', 'graduated')->count(),
             'new_this_month' => Student::whereMonth('created_at', now()->month)
                                         ->whereYear('created_at', now()->year)
                                         ->count(),
+            'total_users' => \App\Models\User::count(),
+            'total_documents' => \App\Models\StudentDocument::count(),
+            'total_audit_logs' => \App\Models\AuditLog::count(),
+            // Placeholders for features not yet implemented to match UI request
+            'fees_collection' => 0,
+            'banks' => 0,
+            'classes' => 0,
+            'hostels' => 0,
+            'exam_results' => 0,
+            'events' => 0,
         ];
-
-        $gradeStats = Student::select('grade', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
-                             ->whereNotNull('grade')
-                             ->groupBy('grade')
-                             ->get();
 
         $recentStudents = Student::orderBy('created_at', 'desc')->take(5)->get();
 
-        return view('dashboard', compact('stats', 'gradeStats', 'recentStudents'));
-    }
-
-    public function create()
-    {
-        return view('create');
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'stats' => $stats,
+                'recentStudents' => $recentStudents,
+            ]
+        ]);
     }
 
     public function store(Request $request)
@@ -84,25 +96,25 @@ class StudentController extends Controller
             'status' => 'nullable|in:active,inactive,graduated',
         ]);
 
-        // Set default status if not provided
         $data['status'] = $data['status'] ?? 'active';
 
         $student = Student::create($data);
 
-        // Log the creation
         $this->logAudit('create', $student, null, $data);
 
-        return redirect()->route('students.index')->with('success', 'Student added successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Student added successfully.',
+            'data' => $student
+        ], 201);
     }
 
     public function show(Student $student)
     {
-        return view('show', compact('student'));
-    }
-
-    public function edit(Student $student)
-    {
-        return view('edit', compact('student'));
+        return response()->json([
+            'success' => true,
+            'data' => $student->load('documents')
+        ]);
     }
 
     public function update(Request $request, Student $student)
@@ -118,27 +130,33 @@ class StudentController extends Controller
             'date_of_birth' => 'nullable|date|before:today',
             'guardian_name' => 'nullable|string|max:255',
             'guardian_phone' => 'nullable|string|max:50',
-            'status' => 'required|in:active,inactive,graduated',
+            'status' => 'sometimes|required|in:active,inactive,graduated',
         ]);
 
         $student->update($data);
+        
+        $student->load('documents');
 
-        // Log the update
         $this->logAudit('update', $student, $oldValues, $data);
 
-        return redirect()->route('students.index')->with('success', 'Student updated successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Student updated successfully.',
+            'data' => $student
+        ]);
     }
 
     public function destroy(Student $student)
     {
         $oldValues = $student->toArray();
-
         $student->delete();
 
-        // Log the deletion
         $this->logAudit('delete', $student, $oldValues, null);
 
-        return redirect()->route('students.index')->with('success', 'Student deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Student deleted successfully.'
+        ]);
     }
 
     public function forceDelete($id)
@@ -146,38 +164,40 @@ class StudentController extends Controller
         $student = Student::withTrashed()->findOrFail($id);
         $oldValues = $student->toArray();
 
-        // Delete associated documents first
         foreach ($student->documents as $document) {
-            \Illuminate\Support\Facades\Storage::delete($document->file_path);
+            Storage::delete($document->file_path);
             $document->delete();
         }
 
         $student->forceDelete();
 
-        // Log the permanent deletion
         $this->logAudit('force_delete', $student, $oldValues, null);
 
-        return redirect()->route('students.index')->with('success', 'Student permanently deleted.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Student permanently deleted.'
+        ]);
     }
 
-    // Bulk actions
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('student_ids', []);
         
         if (empty($ids)) {
-            return redirect()->back()->with('error', 'No students selected.');
+            return response()->json(['success' => false, 'message' => 'No students selected.'], 400);
         }
 
         $students = Student::whereIn('id', $ids)->get();
-
         foreach ($students as $student) {
             $oldValues = $student->toArray();
             $student->delete();
             $this->logAudit('delete', $student, $oldValues, null);
         }
 
-        return redirect()->back()->with('success', count($ids) . ' students deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => count($ids) . ' students deleted successfully.'
+        ]);
     }
 
     public function bulkForceDelete(Request $request)
@@ -185,25 +205,25 @@ class StudentController extends Controller
         $ids = $request->input('student_ids', []);
         
         if (empty($ids)) {
-            return redirect()->back()->with('error', 'No students selected.');
+            return response()->json(['success' => false, 'message' => 'No students selected.'], 400);
         }
 
         $students = Student::withTrashed()->whereIn('id', $ids)->get();
 
         foreach ($students as $student) {
             $oldValues = $student->toArray();
-            
-            // Delete associated documents
             foreach ($student->documents as $document) {
-                \Illuminate\Support\Facades\Storage::delete($document->file_path);
+                Storage::delete($document->file_path);
                 $document->delete();
             }
-
             $student->forceDelete();
             $this->logAudit('force_delete', $student, $oldValues, null);
         }
 
-        return redirect()->back()->with('success', count($ids) . ' students permanently deleted.');
+        return response()->json([
+            'success' => true,
+            'message' => count($ids) . ' students permanently deleted.'
+        ]);
     }
 
     public function deleteAll()
@@ -217,7 +237,10 @@ class StudentController extends Controller
             $this->logAudit('delete', $student, $oldValues, null);
         }
 
-        return redirect()->back()->with('success', "Successfully deleted all {$count} students.");
+        return response()->json([
+            'success' => true,
+            'message' => "Successfully deleted all {$count} students."
+        ]);
     }
 
     public function bulkUpdateStatus(Request $request)
@@ -226,7 +249,7 @@ class StudentController extends Controller
         $status = $request->input('status');
 
         if (empty($ids) || !$status) {
-            return redirect()->back()->with('error', 'No students selected or status not specified.');
+            return response()->json(['success' => false, 'message' => 'No students selected or status not specified.'], 400);
         }
 
         $students = Student::whereIn('id', $ids)->get();
@@ -236,15 +259,16 @@ class StudentController extends Controller
             $this->logAudit('update', $student, $oldValues, ['status' => $status]);
         }
 
-        return redirect()->back()->with('success', count($ids) . ' students updated successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => count($ids) . ' students updated successfully.'
+        ]);
     }
 
-    // Export functionality
     public function export(Request $request)
     {
         $query = Student::query();
 
-        // Apply same filters as index
         if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function($q) use ($search) {
@@ -278,7 +302,7 @@ class StudentController extends Controller
                     $student->phone,
                     $student->grade,
                     $student->address,
-                    $student->date_of_birth ? $student->date_of_birth->format('Y-m-d') : '',
+                    $student->date_of_birth ? \Carbon\Carbon::parse($student->date_of_birth)->format('Y-m-d') : '',
                     $student->guardian_name,
                     $student->guardian_phone,
                     $student->status,
@@ -301,7 +325,7 @@ class StudentController extends Controller
         $file = $request->file('document');
         $path = $file->store('student_documents/' . $student->id);
 
-        $student->documents()->create([
+        $document = $student->documents()->create([
             'file_path' => $path,
             'file_name' => $file->getClientOriginalName(),
             'file_type' => $file->getClientOriginalExtension(),
@@ -309,7 +333,11 @@ class StudentController extends Controller
             'uploaded_by' => auth()->id(),
         ]);
 
-        return redirect()->back()->with('success', 'Document uploaded successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Document uploaded successfully.',
+            'data' => $document
+        ], 201);
     }
 
     public function downloadDocument(\App\Models\StudentDocument $document)
@@ -322,20 +350,21 @@ class StudentController extends Controller
         $oldValues = $document->toArray();
         $student = $document->student;
 
-        \Illuminate\Support\Facades\Storage::delete($document->file_path);
+        Storage::delete($document->file_path);
         $document->delete();
 
-        // Log the deletion of the document under the student's audit trail
         $this->logAudit('delete_document', $student, $oldValues, null);
 
-        return redirect()->back()->with('success', 'Document deleted successfully.');
+        return response()->json([
+            'success' => true,
+            'message' => 'Document deleted successfully.'
+        ]);
     }
 
-    // Private helper method for audit logging
     private function logAudit($action, $model, $oldValues = null, $newValues = null)
     {
         \App\Models\AuditLog::create([
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id() ?? 1, // Fallback if no user
             'model_type' => get_class($model),
             'model_id' => $model->id,
             'action' => $action,

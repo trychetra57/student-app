@@ -3,195 +3,560 @@
 @section('title', 'Dashboard - Student Management')
 
 @section('content')
-<div class="container-lg">
-    <div class="page-header">
-        <h1 class="page-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
-        <div class="d-flex gap-2">
-            <a href="{{ route('students.export') }}" class="btn btn-success">
-                <i class="fas fa-download"></i> Export Data
-            </a>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    .dashboard-wrap {
+        font-family: 'Inter', sans-serif;
+        background: #f0f2f8;
+        min-height: 100vh;
+        padding: 0 0 40px;
+    }
+
+    /* ── Hero Banner ── */
+    .dash-hero {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+        color: white;
+        padding: 36px 36px 80px;
+        position: relative;
+        overflow: hidden;
+    }
+    .dash-hero::before {
+        content: '';
+        position: absolute;
+        top: -60px; right: -60px;
+        width: 300px; height: 300px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.06);
+    }
+    .dash-hero::after {
+        content: '';
+        position: absolute;
+        bottom: -80px; left: 30%;
+        width: 400px; height: 400px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.04);
+    }
+    .dash-hero h1 {
+        font-size: 1.9rem;
+        font-weight: 800;
+        margin: 0 0 4px;
+        letter-spacing: -0.5px;
+    }
+    .dash-hero p  { margin: 0; opacity: 0.75; font-size: 0.95rem; }
+    .dash-hero .hero-actions { display: flex; gap: 10px; }
+    .btn-hero {
+        background: rgba(255,255,255,0.15);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 9px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 0.88rem;
+        text-decoration: none;
+        transition: all 0.25s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .btn-hero:hover {
+        background: rgba(255,255,255,0.28);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    }
+
+    /* ── Stat Cards ── */
+    .stats-row {
+        padding: 0 24px;
+        margin-top: -48px;
+        position: relative;
+        z-index: 10;
+    }
+    .stat-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px 22px;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+        border: none;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        height: 100%;
+    }
+    .stat-card::after {
+        content: '';
+        position: absolute;
+        top: 0; right: 0;
+        width: 80px; height: 80px;
+        border-radius: 0 16px 0 80px;
+        opacity: 0.08;
+    }
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.14);
+    }
+    .stat-card .icon-wrap {
+        width: 52px; height: 52px;
+        border-radius: 14px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.4rem;
+        color: white;
+        margin-bottom: 16px;
+        flex-shrink: 0;
+    }
+    .stat-card .stat-num {
+        font-size: 2.2rem;
+        font-weight: 800;
+        line-height: 1;
+        margin-bottom: 4px;
+        letter-spacing: -1px;
+    }
+    .stat-card .stat-label {
+        font-size: 0.82rem;
+        font-weight: 500;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .stat-card .stat-trend {
+        font-size: 0.78rem;
+        font-weight: 600;
+        margin-top: 8px;
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+
+    /* Card accent colors */
+    .sc-blue  .icon-wrap { background: linear-gradient(135deg,#2563eb,#60a5fa); }
+    .sc-blue  .stat-num  { color: #1e40af; }
+    .sc-blue  .stat-trend { background:#dbeafe; color:#1d4ed8; }
+    .sc-blue::after       { background:#2563eb; }
+
+    .sc-green .icon-wrap { background: linear-gradient(135deg,#16a34a,#4ade80); }
+    .sc-green .stat-num  { color: #15803d; }
+    .sc-green .stat-trend { background:#dcfce7; color:#166534; }
+    .sc-green::after      { background:#16a34a; }
+
+    .sc-purple .icon-wrap { background: linear-gradient(135deg,#7c3aed,#a78bfa); }
+    .sc-purple .stat-num  { color: #6d28d9; }
+    .sc-purple .stat-trend { background:#ede9fe; color:#5b21b6; }
+    .sc-purple::after      { background:#7c3aed; }
+
+    .sc-orange .icon-wrap { background: linear-gradient(135deg,#ea580c,#fb923c); }
+    .sc-orange .stat-num  { color: #c2410c; }
+    .sc-orange .stat-trend { background:#ffedd5; color:#c2410c; }
+    .sc-orange::after      { background:#ea580c; }
+
+    .sc-rose .icon-wrap { background: linear-gradient(135deg,#e11d48,#fb7185); }
+    .sc-rose .stat-num  { color: #be123c; }
+    .sc-rose .stat-trend { background:#ffe4e6; color:#be123c; }
+    .sc-rose::after      { background:#e11d48; }
+
+    .sc-teal .icon-wrap { background: linear-gradient(135deg,#0891b2,#22d3ee); }
+    .sc-teal .stat-num  { color: #0e7490; }
+    .sc-teal .stat-trend { background:#cffafe; color:#0e7490; }
+    .sc-teal::after      { background:#0891b2; }
+
+    /* ── Section Headers ── */
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+    .section-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .section-title i { color: #2563eb; }
+
+    /* ── Chart Cards ── */
+    .chart-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        border: none;
+        padding: 24px;
+        height: 100%;
+    }
+    .chart-card .chart-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+    .chart-card .chart-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .chart-badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 4px 10px;
+        border-radius: 20px;
+        background: #eff6ff;
+        color: #2563eb;
+    }
+
+    /* ── Quick Actions ── */
+    .quick-actions {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        padding: 24px;
+    }
+    .action-btn {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.2s;
+        margin-bottom: 10px;
+        border: 1.5px solid #e2e8f0;
+        color: #334155;
+        font-weight: 600;
+        font-size: 0.88rem;
+    }
+    .action-btn:last-child { margin-bottom: 0; }
+    .action-btn:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; transform: translateX(4px); }
+    .action-btn .ab-icon {
+        width: 36px; height: 36px;
+        border-radius: 10px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+    }
+
+    /* ── Progress Bar ── */
+    .progress-wrap { margin-bottom: 16px; }
+    .progress-wrap:last-child { margin-bottom: 0; }
+    .progress-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 6px;
+    }
+    .progress {
+        height: 8px;
+        border-radius: 20px;
+        background: #f1f5f9;
+    }
+    .progress-bar { border-radius: 20px; transition: width 1.5s cubic-bezier(.4,0,.2,1); }
+
+    /* ── Activity Feed ── */
+    .activity-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+        padding: 24px;
+    }
+    .activity-empty {
+        text-align: center;
+        padding: 30px 0;
+        color: #94a3b8;
+    }
+    .activity-empty i { font-size: 2.5rem; margin-bottom: 10px; display: block; }
+
+    /* ── Counter animation ── */
+    .counter { display: inline-block; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+        .dash-hero { padding: 24px 20px 64px; }
+        .stats-row { padding: 0 12px; }
+        .dash-hero h1 { font-size: 1.4rem; }
+        .stat-card .stat-num { font-size: 1.7rem; }
+    }
+</style>
+
+<div class="dashboard-wrap">
+
+    {{-- ── Hero Banner ── --}}
+    <div class="dash-hero">
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+            <div>
+                <h1><i class="fas fa-graduation-cap me-2"></i>Student Dashboard</h1>
+                <p>Welcome back, <strong>{{ Auth::user()->name }}</strong> · {{ now()->format('l, F j, Y') }}</p>
+            </div>
+            <div class="hero-actions mt-1">
+                <a href="{{ route('students.create') }}" class="btn-hero">
+                    <i class="fas fa-plus"></i> Add Student
+                </a>
+                <a href="{{ route('students.export') }}" class="btn-hero">
+                    <i class="fas fa-download"></i> Export CSV
+                </a>
+            </div>
         </div>
     </div>
 
-    <!-- Statistics Cards -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card stats-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stats-icon bg-primary">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h3 class="mb-0">{{ $stats['total_students'] }}</h3>
-                            <small class="text-muted">Total Students</small>
-                        </div>
-                    </div>
+    {{-- ── Stat Cards ── --}}
+    <div class="stats-row">
+        <div class="row g-3">
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card sc-blue">
+                    <div class="icon-wrap"><i class="fas fa-users"></i></div>
+                    <div class="stat-num counter" data-target="{{ $stats['total_students'] }}">0</div>
+                    <div class="stat-label">Total Students</div>
+                    <div class="stat-trend"><i class="fas fa-database"></i> All Records</div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stats-icon bg-success">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h3 class="mb-0">{{ $stats['active_students'] }}</h3>
-                            <small class="text-muted">Active Students</small>
-                        </div>
-                    </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card sc-green">
+                    <div class="icon-wrap"><i class="fas fa-check-circle"></i></div>
+                    <div class="stat-num counter" data-target="{{ $stats['active_students'] }}">0</div>
+                    <div class="stat-label">Active</div>
+                    <div class="stat-trend"><i class="fas fa-circle"></i> Enrolled</div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stats-icon bg-warning">
-                            <i class="fas fa-graduation-cap"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h3 class="mb-0">{{ $stats['graduated_students'] }}</h3>
-                            <small class="text-muted">Graduated</small>
-                        </div>
-                    </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card sc-rose">
+                    <div class="icon-wrap"><i class="fas fa-times-circle"></i></div>
+                    <div class="stat-num counter" data-target="{{ $stats['inactive_students'] }}">0</div>
+                    <div class="stat-label">Inactive</div>
+                    <div class="stat-trend"><i class="fas fa-pause-circle"></i> On Hold</div>
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card stats-card">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="stats-icon bg-info">
-                            <i class="fas fa-user-plus"></i>
-                        </div>
-                        <div class="ms-3">
-                            <h3 class="mb-0">{{ $stats['new_this_month'] }}</h3>
-                            <small class="text-muted">New This Month</small>
-                        </div>
-                    </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card sc-purple">
+                    <div class="icon-wrap"><i class="fas fa-graduation-cap"></i></div>
+                    <div class="stat-num counter" data-target="{{ $stats['graduated_students'] }}">0</div>
+                    <div class="stat-label">Graduated</div>
+                    <div class="stat-trend"><i class="fas fa-award"></i> Alumni</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card sc-orange">
+                    <div class="icon-wrap"><i class="fas fa-user-plus"></i></div>
+                    <div class="stat-num counter" data-target="{{ $stats['new_this_month'] }}">0</div>
+                    <div class="stat-label">New This Month</div>
+                    <div class="stat-trend"><i class="fas fa-calendar"></i> {{ now()->format('M Y') }}</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card sc-teal">
+                    <div class="icon-wrap"><i class="fas fa-file-alt"></i></div>
+                    <div class="stat-num counter" data-target="{{ $stats['total_documents'] }}">0</div>
+                    <div class="stat-label">Documents</div>
+                    <div class="stat-trend"><i class="fas fa-paperclip"></i> Uploaded</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row">
-        <!-- Grade Distribution -->
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-chart-pie"></i> Students by Grade
-                </div>
-                <div class="card-body">
-                    @if($gradeStats->isNotEmpty())
-                        <canvas id="gradeChart" width="400" height="300"></canvas>
-                    @else
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-chart-pie fa-3x mb-3"></i>
-                            <p>No grade data available</p>
+    {{-- ── Main Content ── --}}
+    <div class="px-4 mt-4">
+        <div class="row g-4">
+
+            {{-- Charts Column --}}
+            <div class="col-lg-8">
+                <div class="row g-4">
+
+                    {{-- Status Chart --}}
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="fas fa-chart-bar text-primary me-2"></i>Student Status Overview</span>
+                                <span class="chart-badge">Live Data</span>
+                            </div>
+                            <canvas id="statusChart" height="100"></canvas>
                         </div>
-                    @endif
+                    </div>
+
+                    {{-- Grade Pie Chart --}}
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="fas fa-chart-pie text-purple me-2" style="color:#7c3aed"></i>By Grade</span>
+                            </div>
+                            @if($gradeStats->isNotEmpty())
+                                <canvas id="gradeChart" height="220"></canvas>
+                            @else
+                                <div class="activity-empty">
+                                    <i class="fas fa-chart-pie"></i>
+                                    <p class="mb-0">No grade data yet</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Enrollment Progress --}}
+                    <div class="col-md-6">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="fas fa-tasks text-success me-2"></i>Status Breakdown</span>
+                            </div>
+                            @php
+                                $total = max($stats['total_students'], 1);
+                                $activePct    = round($stats['active_students']    / $total * 100);
+                                $inactivePct  = round($stats['inactive_students']  / $total * 100);
+                                $graduatedPct = round($stats['graduated_students'] / $total * 100);
+                            @endphp
+                            <div class="pt-2">
+                                <div class="progress-wrap">
+                                    <div class="progress-label">
+                                        <span><i class="fas fa-circle text-success me-1"></i>Active</span>
+                                        <span>{{ $stats['active_students'] }} ({{ $activePct }}%)</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-success" style="width:0%" data-width="{{ $activePct }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-wrap">
+                                    <div class="progress-label">
+                                        <span><i class="fas fa-circle text-danger me-1"></i>Inactive</span>
+                                        <span>{{ $stats['inactive_students'] }} ({{ $inactivePct }}%)</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar bg-danger" style="width:0%" data-width="{{ $inactivePct }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="progress-wrap">
+                                    <div class="progress-label">
+                                        <span><i class="fas fa-circle" style="color:#7c3aed"></i>&nbsp;Graduated</span>
+                                        <span>{{ $stats['graduated_students'] }} ({{ $graduatedPct }}%)</span>
+                                    </div>
+                                    <div class="progress">
+                                        <div class="progress-bar" style="width:0%;background:#7c3aed" data-width="{{ $graduatedPct }}%"></div>
+                                    </div>
+                                </div>
+
+                                {{-- Summary table --}}
+                                <div class="mt-4 pt-3 border-top">
+                                    <div class="row text-center g-2">
+                                        <div class="col-4">
+                                            <div style="font-size:1.4rem;font-weight:800;color:#16a34a">{{ $stats['active_students'] }}</div>
+                                            <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase">Active</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div style="font-size:1.4rem;font-weight:800;color:#e11d48">{{ $stats['inactive_students'] }}</div>
+                                            <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase">Inactive</div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div style="font-size:1.4rem;font-weight:800;color:#7c3aed">{{ $stats['graduated_students'] }}</div>
+                                            <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase">Graduated</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </div>
 
-        <!-- Status Distribution -->
-        <div class="col-lg-6">
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-chart-bar"></i> Students by Status
-                </div>
-                <div class="card-body">
-                    <canvas id="statusChart" width="400" height="300"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
+            {{-- Right Sidebar --}}
+            <div class="col-lg-4">
+                <div class="row g-4">
 
-    <!-- Recent Students -->
-    <div class="card mt-4">
-        <div class="card-header">
-            <i class="fas fa-clock"></i> Recent Students
-        </div>
-        <div class="card-body">
-            @if($recentStudents->isNotEmpty())
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Grade</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($recentStudents as $student)
-                            <tr>
-                                <td>{{ $student->name }}</td>
-                                <td>{{ $student->email }}</td>
-                                <td>{{ $student->grade ?? '-' }}</td>
-                                <td>
-                                    <span class="badge {{ $student->status == 'active' ? 'bg-success' : ($student->status == 'inactive' ? 'bg-warning' : 'bg-info') }}">
-                                        {{ ucfirst($student->status) }}
+                    {{-- Quick Actions --}}
+                    <div class="col-12">
+                        <div class="quick-actions">
+                            <div class="section-header mb-3">
+                                <span class="section-title"><i class="fas fa-bolt"></i> Quick Actions</span>
+                            </div>
+                            <a href="{{ route('students.create') }}" class="action-btn">
+                                <div class="ab-icon" style="background:#eff6ff;color:#2563eb"><i class="fas fa-user-plus"></i></div>
+                                Add New Student
+                            </a>
+                            <a href="{{ route('students.index') }}" class="action-btn">
+                                <div class="ab-icon" style="background:#f0fdf4;color:#16a34a"><i class="fas fa-list"></i></div>
+                                View All Students
+                            </a>
+                            <a href="{{ route('students.export') }}" class="action-btn">
+                                <div class="ab-icon" style="background:#fff7ed;color:#ea580c"><i class="fas fa-file-csv"></i></div>
+                                Export to CSV
+                            </a>
+                            <a href="{{ route('audit.index') }}" class="action-btn">
+                                <div class="ab-icon" style="background:#fdf4ff;color:#9333ea"><i class="fas fa-history"></i></div>
+                                View Audit Logs
+                            </a>
+                            <a href="{{ route('backup.index') }}" class="action-btn">
+                                <div class="ab-icon" style="background:#f0fdfa;color:#0891b2"><i class="fas fa-database"></i></div>
+                                Manage Backups
+                            </a>
+                        </div>
+                    </div>
+
+                    {{-- System Info --}}
+                    <div class="col-12">
+                        <div class="activity-card">
+                            <div class="section-header mb-3">
+                                <span class="section-title"><i class="fas fa-info-circle"></i> System Info</span>
+                            </div>
+                            <div style="font-size:0.85rem;">
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <span class="text-muted fw-500">Logged in as</span>
+                                    <span class="fw-bold text-dark">{{ Auth::user()->name }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <span class="text-muted">Role</span>
+                                    <span class="badge rounded-pill" style="background:#eff6ff;color:#2563eb;font-size:0.78rem">
+                                        {{ ucfirst(Auth::user()->role ?? 'staff') }}
                                     </span>
-                                </td>
-                                <td>{{ $student->created_at->diffForHumans() }}</td>
-                                <td>
-                                    <a href="{{ route('students.show', $student) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <span class="text-muted">Today</span>
+                                    <span class="fw-600 text-dark">{{ now()->format('d M Y') }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <span class="text-muted">Total Records</span>
+                                    <span class="fw-bold text-dark">{{ $stats['total_students'] }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center py-2">
+                                    <span class="text-muted">Documents</span>
+                                    <span class="fw-bold text-dark">{{ $stats['total_documents'] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-            @else
-                <div class="text-center text-muted py-4">
-                    <i class="fas fa-users fa-3x mb-3"></i>
-                    <p>No students found</p>
-                </div>
-            @endif
+            </div>
         </div>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Grade Distribution Chart
-    @if($gradeStats->isNotEmpty())
-    const gradeCtx = document.getElementById('gradeChart').getContext('2d');
-    new Chart(gradeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: @json($gradeStats->pluck('grade')),
-            datasets: [{
-                data: @json($gradeStats->pluck('count')),
-                backgroundColor: [
-                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-                    '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                }
-            }
-        }
-    });
-    @endif
+document.addEventListener('DOMContentLoaded', function () {
 
-    // Status Distribution Chart
+    // ── Animated Counters ──
+    document.querySelectorAll('.counter').forEach(el => {
+        const target = parseInt(el.dataset.target) || 0;
+        let current = 0;
+        const step = Math.max(1, Math.ceil(target / 60));
+        const timer = setInterval(() => {
+            current = Math.min(current + step, target);
+            el.textContent = current.toLocaleString();
+            if (current >= target) clearInterval(timer);
+        }, 20);
+    });
+
+    // ── Animated Progress Bars ──
+    setTimeout(() => {
+        document.querySelectorAll('.progress-bar[data-width]').forEach(bar => {
+            bar.style.width = bar.dataset.width;
+        });
+    }, 400);
+
+    // ── Status Bar Chart ──
     const statusCtx = document.getElementById('statusChart').getContext('2d');
     new Chart(statusCtx, {
         type: 'bar',
@@ -205,59 +570,69 @@ document.addEventListener('DOMContentLoaded', function() {
                     {{ $stats['graduated_students'] }}
                 ],
                 backgroundColor: [
-                    '#28a745',
-                    '#ffc107',
-                    '#17a2b8'
+                    'rgba(22,163,74,0.85)',
+                    'rgba(225,29,72,0.85)',
+                    'rgba(124,58,237,0.85)'
                 ],
-                borderWidth: 1
+                borderRadius: 10,
+                borderSkipped: false,
+                borderWidth: 0,
             }]
         },
         options: {
             responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ` ${ctx.parsed.y} students`
                     }
                 }
             },
-            plugins: {
-                legend: {
-                    display: false
+            scales: {
+                x: { grid: { display: false }, ticks: { font: { weight: '600' } } },
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1, font: { size: 11 } },
+                    grid: { color: '#f1f5f9', drawBorder: false }
                 }
-            }
+            },
+            animation: { duration: 1200, easing: 'easeOutQuart' }
         }
     });
+
+    // ── Grade Doughnut Chart ──
+    @if($gradeStats->isNotEmpty())
+    const gradeCtx = document.getElementById('gradeChart').getContext('2d');
+    new Chart(gradeCtx, {
+        type: 'doughnut',
+        data: {
+            labels: @json($gradeStats->pluck('grade')),
+            datasets: [{
+                data: @json($gradeStats->pluck('count')),
+                backgroundColor: [
+                    '#2563eb','#16a34a','#7c3aed','#ea580c',
+                    '#0891b2','#e11d48','#ca8a04','#64748b'
+                ],
+                borderWidth: 3,
+                borderColor: '#ffffff',
+                hoverOffset: 8
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '65%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { padding: 14, font: { size: 11, weight: '600' } }
+                }
+            },
+            animation: { duration: 1200, easing: 'easeOutQuart' }
+        }
+    });
+    @endif
 });
 </script>
 
-<style>
-.stats-card {
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: transform 0.3s ease;
-}
-
-.stats-card:hover {
-    transform: translateY(-5px);
-}
-
-.stats-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 1.5rem;
-}
-
-.bg-primary { background-color: #007bff !important; }
-.bg-success { background-color: #28a745 !important; }
-.bg-warning { background-color: #ffc107 !important; }
-.bg-info { background-color: #17a2b8 !important; }
-</style>
 @endsection
