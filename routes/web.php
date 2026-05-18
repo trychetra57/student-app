@@ -5,6 +5,7 @@ use App\Http\Controllers\WebStudentController;
 use App\Http\Controllers\WebAuditController;
 use App\Http\Controllers\WebBackupController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WebTeacherController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -55,4 +56,7 @@ Route::middleware('auth')->group(function () {
 
     // Standard student CRUD
     Route::resource('students', WebStudentController::class);
+
+    // Teachers CRUD
+    Route::resource('teachers', WebTeacherController::class);
 });

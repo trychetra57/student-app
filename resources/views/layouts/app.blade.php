@@ -413,6 +413,9 @@
             <a href="{{ route('students.create') }}" class="sidebar-link {{ request()->routeIs('students.create') ? 'active' : '' }}">
                 <span class="sl-icon"><i class="fas fa-user-plus"></i></span> Add Student
             </a>
+            <a href="{{ route('teachers.index') }}" class="sidebar-link {{ request()->routeIs('teachers.*') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-chalkboard-teacher"></i></span> Teachers
+            </a>
             <a href="{{ route('students.export') }}" class="sidebar-link">
                 <span class="sl-icon"><i class="fas fa-file-csv"></i></span> Export CSV
             </a>
