@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Add Teacher - Fantastic School Admin')
+@section('title', 'Add Teacher - BelTei University Admin')
 
 @section('content')
 <div class="container-lg" style="max-width:760px;">

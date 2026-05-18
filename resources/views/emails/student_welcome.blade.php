@@ -26,7 +26,7 @@
 <div class="card">
     <div class="header">
         <i>🎓</i>
-        <h1>Welcome to Fantastic School!</h1>
+        <h1>Welcome to BelTei University!</h1>
         <p>Student Registration Confirmed</p>
     </div>
     <div class="body">
@@ -68,7 +68,7 @@
         </p>
     </div>
     <div class="footer">
-        <strong>Fantastic School Admin</strong><br>
+        <strong>BelTei University Admin</strong><br>
         &copy; {{ date('Y') }} Student Management System. All rights reserved.
     </div>
 </div>

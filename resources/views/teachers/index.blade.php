@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Teachers - Fantastic School Admin')
+@section('title', 'Teachers - BelTei University Admin')
 
 @section('content')
 <div class="container-lg">

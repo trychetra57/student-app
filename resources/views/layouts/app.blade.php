@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Fantastic School Admin — Student Management System">
+    <meta name="description" content="BelTei University Admin — Student Management System">
     <title>@yield('title', 'Student Management System')</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -397,7 +397,7 @@
         <a class="sidebar-brand" href="{{ route('dashboard') }}">
             <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
             <div>
-                <div class="brand-text">Fantastic School</div>
+                <div class="brand-text">BelTei University</div>
                 <div class="brand-sub">Admin Panel</div>
             </div>
         </a>
@@ -522,7 +522,7 @@
         </main>
 
         <footer class="footer">
-            &copy; {{ date('Y') }} Fantastic School Admin &mdash; Student Management System
+            &copy; {{ date('Y') }} BelTei University Admin &mdash; Student Management System
         </footer>
     </div>
 
