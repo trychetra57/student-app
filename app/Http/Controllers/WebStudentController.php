@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\StudentDocument;
+use App\Mail\StudentWelcomeMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class WebStudentController extends Controller
@@ -12,29 +15,55 @@ class WebStudentController extends Controller
     {
         $query = Student::query()->with('documents');
 
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('grade', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%");
-            });
+        // Full-text search
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(fn($q) => $q
+                ->where('name',    'like', "%$s%")
+                ->orWhere('email', 'like', "%$s%")
+                ->orWhere('phone', 'like', "%$s%")
+                ->orWhere('grade', 'like', "%$s%")
+                ->orWhere('address','like',"%$s%")
+            );
         }
 
-        if ($request->has('status') && $request->status !== 'all') {
+        // Status filter
+        if ($request->filled('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
+        }
+
+        // Grade filter
+        if ($request->filled('grade')) {
+            $query->where('grade', $request->grade);
+        }
+
+        // Date range filter
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
         }
 
         $sort      = $request->get('sort', 'name');
         $direction = $request->get('direction', 'asc');
-        $query->orderBy($sort, $direction);
+        $allowed   = ['name','email','grade','status','created_at'];
+        if (in_array($sort, $allowed)) {
+            $query->orderBy($sort, $direction);
+        }
 
         $perPage  = $request->get('per_page', 10);
         $students = $query->paginate($perPage)->withQueryString();
 
-        return view('index', compact('students'));
+        // Sidebar counts (unfiltered)
+        $activeCount    = Student::where('status','active')->count();
+        $inactiveCount  = Student::where('status','inactive')->count();
+        $graduatedCount = Student::where('status','graduated')->count();
+
+        // Grade list for filter dropdown
+        $grades = Student::whereNotNull('grade')->distinct()->orderBy('grade')->pluck('grade');
+
+        return view('index', compact('students','activeCount','inactiveCount','graduatedCount','grades'));
     }
 
     public function create()
@@ -57,9 +86,16 @@ class WebStudentController extends Controller
         ]);
 
         $data['status'] = $data['status'] ?? 'active';
-        Student::create($data);
+        $student = Student::create($data);
 
-        return redirect()->route('students.index')->with('success', 'Student added successfully!');
+        // Send welcome email (gracefully fails if mail not configured)
+        try {
+            Mail::to($student->email)->send(new StudentWelcomeMail($student));
+        } catch (\Exception $e) {
+            // Silent fail — mail not configured
+        }
+
+        return redirect()->route('students.index')->with('success', "Student '{$student->name}' added successfully!");
     }
 
     public function show(Student $student)
@@ -77,7 +113,7 @@ class WebStudentController extends Controller
     {
         $data = $request->validate([
             'name'           => 'required|string|max:255',
-            'email'          => 'required|email|unique:students,email,' . $student->id,
+            'email'          => 'required|email|unique:students,email,'.$student->id,
             'phone'          => 'nullable|string|max:50',
             'grade'          => 'nullable|string|max:100',
             'address'        => 'nullable|string|max:500',
@@ -88,61 +124,52 @@ class WebStudentController extends Controller
         ]);
 
         $student->update($data);
-
         return redirect()->route('students.show', $student)->with('success', 'Student updated successfully!');
     }
 
     public function destroy(Student $student)
     {
         $student->delete();
-        return redirect()->route('students.index')->with('success', 'Student deleted successfully!');
+        return redirect()->route('students.index')->with('success', 'Student deleted.');
     }
 
     public function deleteAll()
     {
         $count = Student::count();
         Student::query()->delete();
-        return redirect()->route('students.index')->with('success', "Successfully deleted all {$count} students.");
+        return redirect()->route('students.index')->with('success', "Deleted all {$count} students.");
     }
 
     public function bulkDelete(Request $request)
     {
         $ids = $request->input('student_ids', []);
-        if (empty($ids)) {
-            return redirect()->back()->with('error', 'No students selected.');
-        }
+        if (empty($ids)) return redirect()->back()->with('error','No students selected.');
         $count = Student::whereIn('id', $ids)->delete();
-        return redirect()->route('students.index')->with('success', "{$count} student(s) deleted successfully.");
+        return redirect()->route('students.index')->with('success', "{$count} student(s) deleted.");
     }
 
     public function bulkForceDelete(Request $request)
     {
         $ids = $request->input('student_ids', []);
-        if (empty($ids)) {
-            return redirect()->back()->with('error', 'No students selected.');
-        }
+        if (empty($ids)) return redirect()->back()->with('error','No students selected.');
         $students = Student::withTrashed()->whereIn('id', $ids)->get();
-        foreach ($students as $student) {
-            foreach ($student->documents as $doc) {
+        foreach ($students as $s) {
+            foreach ($s->documents as $doc) {
                 Storage::delete($doc->file_path);
                 $doc->delete();
             }
-            $student->forceDelete();
+            $s->forceDelete();
         }
-        return redirect()->route('students.index')->with('success', count($ids) . " student(s) permanently deleted.");
+        return redirect()->route('students.index')->with('success', count($ids)." student(s) permanently deleted.");
     }
 
     public function bulkUpdateStatus(Request $request)
     {
         $ids    = $request->input('student_ids', []);
         $status = $request->input('status');
-
-        if (empty($ids) || !$status) {
-            return redirect()->back()->with('error', 'No students selected or status not specified.');
-        }
-
+        if (empty($ids) || !$status) return redirect()->back()->with('error','Invalid request.');
         Student::whereIn('id', $ids)->update(['status' => $status]);
-        return redirect()->route('students.index')->with('success', count($ids) . " student(s) status updated to {$status}.");
+        return redirect()->route('students.index')->with('success', count($ids)." student(s) set to {$status}.");
     }
 
     public function uploadDocument(Request $request, Student $student)
@@ -151,10 +178,8 @@ class WebStudentController extends Controller
             'document' => 'required|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
             'type'     => 'required|string|max:50',
         ]);
-
         $file = $request->file('document');
-        $path = $file->store('student_documents/' . $student->id);
-
+        $path = $file->store('student_documents/'.$student->id);
         $student->documents()->create([
             'file_path'     => $path,
             'file_name'     => $file->getClientOriginalName(),
@@ -162,9 +187,7 @@ class WebStudentController extends Controller
             'document_type' => $request->type,
             'uploaded_by'   => auth()->id(),
         ]);
-
-        return redirect()->route('students.show', $student)
-                         ->with('success', 'Document uploaded successfully.');
+        return redirect()->route('students.show', $student)->with('success','Document uploaded.');
     }
 
     public function downloadDocument(\App\Models\StudentDocument $document)
@@ -177,76 +200,59 @@ class WebStudentController extends Controller
         $student = $document->student;
         Storage::delete($document->file_path);
         $document->delete();
-
-        return redirect()->route('students.show', $student)
-                         ->with('success', 'Document deleted successfully.');
+        return redirect()->route('students.show', $student)->with('success','Document deleted.');
     }
 
     public function export(Request $request)
     {
         $query = Student::query();
-
-        if ($request->has('search') && !empty($request->search)) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
-            });
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(fn($q) => $q->where('name','like',"%$s%")->orWhere('email','like',"%$s%")->orWhere('phone','like',"%$s%"));
         }
-
-        if ($request->has('status') && $request->status !== 'all') {
-            $query->where('status', $request->status);
-        }
-
+        if ($request->filled('status') && $request->status !== 'all') $query->where('status', $request->status);
+        if ($request->filled('grade')) $query->where('grade', $request->grade);
         $students = $query->get();
-        $filename = 'students_' . date('Y-m-d_H-i-s') . '.csv';
+        $filename = 'students_'.date('Y-m-d_H-i-s').'.csv';
 
-        $callback = function () use ($students) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, ['ID', 'Name', 'Email', 'Phone', 'Grade', 'Address', 'Date of Birth', 'Guardian Name', 'Guardian Phone', 'Status', 'Created At']);
-            foreach ($students as $student) {
-                fputcsv($file, [
-                    $student->id,
-                    $student->name,
-                    $student->email,
-                    $student->phone,
-                    $student->grade,
-                    $student->address,
-                    $student->date_of_birth ? \Carbon\Carbon::parse($student->date_of_birth)->format('Y-m-d') : '',
-                    $student->guardian_name,
-                    $student->guardian_phone,
-                    $student->status,
-                    $student->created_at ? $student->created_at->format('Y-m-d H:i:s') : '',
-                ]);
+        return response()->streamDownload(function() use ($students) {
+            $f = fopen('php://output','w');
+            fputcsv($f,['ID','Name','Email','Phone','Grade','Address','Date of Birth','Guardian Name','Guardian Phone','Status','Created At']);
+            foreach ($students as $s) {
+                fputcsv($f,[$s->id,$s->name,$s->email,$s->phone,$s->grade,$s->address,
+                    $s->date_of_birth?\Carbon\Carbon::parse($s->date_of_birth)->format('Y-m-d'):'',
+                    $s->guardian_name,$s->guardian_phone,$s->status,
+                    $s->created_at?$s->created_at->format('Y-m-d H:i:s'):'']);
             }
-            fclose($file);
-        };
-
-        return response()->streamDownload($callback, $filename, [
-            'Content-Type' => 'text/csv',
-        ]);
+            fclose($f);
+        }, $filename, ['Content-Type'=>'text/csv']);
     }
 
     public function dashboard()
     {
         $stats = [
             'total_students'     => Student::count(),
-            'active_students'    => Student::where('status', 'active')->count(),
-            'inactive_students'  => Student::where('status', 'inactive')->count(),
-            'graduated_students' => Student::where('status', 'graduated')->count(),
-            'new_this_month'     => Student::whereMonth('created_at', now()->month)
-                                           ->whereYear('created_at', now()->year)
-                                           ->count(),
-            'total_documents'    => \App\Models\StudentDocument::count(),
+            'active_students'    => Student::where('status','active')->count(),
+            'inactive_students'  => Student::where('status','inactive')->count(),
+            'graduated_students' => Student::where('status','graduated')->count(),
+            'new_this_month'     => Student::whereMonth('created_at',now()->month)->whereYear('created_at',now()->year)->count(),
+            'total_documents'    => StudentDocument::count(),
         ];
 
         $gradeStats = Student::selectRaw('grade, count(*) as count')
-                             ->whereNotNull('grade')
-                             ->groupBy('grade')
-                             ->orderByDesc('count')
-                             ->get();
+            ->whereNotNull('grade')->groupBy('grade')->orderByDesc('count')->get();
 
-        return view('dashboard', compact('stats', 'gradeStats'));
+        // Monthly enrollment for the last 12 months
+        $monthlyData = [];
+        for ($i = 11; $i >= 0; $i--) {
+            $date = now()->subMonths($i);
+            $monthlyData[] = [
+                'month' => $date->format('M Y'),
+                'count' => Student::whereMonth('created_at', $date->month)
+                                  ->whereYear('created_at', $date->year)->count(),
+            ];
+        }
+
+        return view('dashboard', compact('stats','gradeStats','monthlyData'));
     }
 }

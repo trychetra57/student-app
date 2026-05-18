@@ -3,298 +3,555 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Fantastic School Admin — Student Management System">
     <title>@yield('title', 'Student Management System')</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #3d8bfd;
-            --secondary-color: #6c757d;
-            --danger-color: #e74c3c;
-            --success-color: #23632d;
-            --light-bg: #f4f6f8;
+            --sidebar-width: 260px;
+            --topbar-height: 64px;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --sidebar-bg: #0f172a;
+            --sidebar-text: rgba(255,255,255,0.7);
+            --sidebar-active: #2563eb;
+            --danger: #e11d48;
+            --success: #16a34a;
+            --warning: #d97706;
+            --surface: #ffffff;
+            --bg: #f0f2f8;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-muted: #94a3b8;
         }
+        * { box-sizing: border-box; }
         body {
-            background-color: var(--light-bg);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-top: 70px;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            overflow-x: hidden;
         }
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+
+        /* ── Sidebar ── */
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--sidebar-bg);
+            z-index: 1040;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+        .sidebar-brand {
+            padding: 22px 24px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+        .sidebar-brand .brand-icon {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, var(--primary), #60a5fa);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            color: white;
+            flex-shrink: 0;
+        }
+        .sidebar-brand .brand-text {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1.2;
+        }
+        .sidebar-brand .brand-sub {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+            font-weight: 400;
+        }
+        .sidebar-nav {
+            padding: 16px 0;
+            flex: 1;
+        }
+        .nav-section {
+            padding: 8px 20px 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.25);
+            margin-top: 8px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            margin: 2px 10px;
+            border-radius: 10px;
+        }
+        .sidebar-link:hover {
+            background: rgba(255,255,255,0.08);
+            color: white;
+        }
+        .sidebar-link.active {
+            background: rgba(37,99,235,0.2);
+            color: #60a5fa;
+            border-left: 3px solid #60a5fa;
+        }
+        .sidebar-link .sl-icon {
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            background: rgba(255,255,255,0.06);
+        }
+        .sidebar-link.active .sl-icon { background: rgba(37,99,235,0.3); }
+        .sidebar-footer {
+            padding: 16px 20px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-user .su-avatar {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg,#2563eb,#60a5fa);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .sidebar-user .su-name {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        .sidebar-user .su-role {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.4);
+        }
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1039;
+        }
+
+        /* ── Topbar ── */
+        .topbar {
             position: fixed;
             top: 0;
-            left: 0;
+            left: var(--sidebar-width);
             right: 0;
-            z-index: 1030;
-        }
-        .navbar-brand {
-            font-weight: 700;
-            font-size: 1.4rem;
-            color: white !important;
-        }
-        .navbar .nav-link {
-            color: rgba(255,255,255,0.8) !important;
-            transition: color 0.3s ease;
-            font-weight: 500;
-        }
-        .navbar .nav-link:hover {
-            color: white !important;
-        }
-        .navbar .nav-link.active {
-            color: white !important;
-            border-bottom: 3px solid white;
-            padding-bottom: 0.5rem;
-        }
-        .user-menu {
-            color: rgba(255,255,255,0.9);
-            cursor: pointer;
-        }
-        .main-content {
-            min-height: calc(100vh - 70px);
-            padding: 30px 0;
-        }
-        .container {
+            height: var(--topbar-height);
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+            z-index: 1030;
+            transition: left 0.3s ease;
         }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-toggle {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            color: #64748b;
+            transition: all 0.2s;
+        }
+        .sidebar-toggle:hover { background: var(--primary-light); color: var(--primary); }
+        .topbar-breadcrumb {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+        .topbar-breadcrumb strong { color: var(--text); }
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .topbar-btn {
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            color: #64748b;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .topbar-btn:hover { background: var(--primary-light); color: var(--primary); border-color: #bfdbfe; }
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px 6px 8px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        .topbar-user:hover { background: var(--primary-light); border-color: #bfdbfe; }
+        .topbar-user .tu-avatar {
+            width: 30px; height: 30px;
+            border-radius: 8px;
+            background: linear-gradient(135deg,#2563eb,#60a5fa);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 0.75rem;
+        }
+        .topbar-user .tu-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* ── Main Content ── */
+        .main-wrap {
+            margin-left: var(--sidebar-width);
+            padding-top: var(--topbar-height);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        .main-content { padding: 28px; }
+
+        /* ── Cards / Common ── */
+        .card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            border-radius: 16px 16px 0 0 !important;
+            font-weight: 700;
+            padding: 18px 24px;
+            color: var(--text);
+            font-size: 0.92rem;
+        }
+        .card-header i { color: var(--primary); margin-right: 8px; }
+        .card-body { padding: 24px; }
         .page-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 16px;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #e9ecef;
+            margin-bottom: 24px;
         }
         .page-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #1a1a1a;
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text);
             margin: 0;
+            letter-spacing: -0.5px;
         }
+        .page-title i { color: var(--primary); margin-right: 10px; }
+
+        /* ── Buttons ── */
         .btn {
             font-weight: 600;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            transition: all 0.3s ease;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            padding: 9px 18px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
         }
-        .btn-primary {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
+        .btn-primary { background: var(--primary); border-color: var(--primary); }
+        .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,0.35); }
+        .btn-secondary { background: #f1f5f9; border-color: #e2e8f0; color: #475569; }
+        .btn-secondary:hover { background: #e2e8f0; color: #1e293b; }
+        .btn-danger { background: var(--danger); border-color: var(--danger); }
+        .btn-danger:hover { background: #be123c; border-color: #be123c; transform: translateY(-1px); }
+        .btn-outline-primary { color: var(--primary); border-color: var(--primary); }
+        .btn-outline-primary:hover { background: var(--primary); }
+        .btn-success { background: var(--success); border-color: var(--success); }
+        .btn-outline-danger { color: var(--danger); border-color: var(--danger); }
+        .btn-outline-danger:hover { background: var(--danger); }
+        .btn-outline-warning { color: var(--warning); border-color: var(--warning); }
+        .btn-outline-warning:hover { background: var(--warning); color: white; }
+
+        /* ── Forms ── */
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            padding: 9px 14px;
+            font-size: 0.875rem;
+            transition: all 0.2s;
         }
-        .btn-primary:hover {
-            background-color: #2563eb;
-            border-color: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(61, 139, 253, 0.3);
-        }
-        .btn-danger {
-            background-color: var(--danger-color);
-            border-color: var(--danger-color);
-        }
-        .btn-danger:hover {
-            background-color: #d63031;
-            border-color: #d63031;
-        }
-        .table {
-            margin-bottom: 0;
-        }
-        .table th {
-            background-color: #f8f9fa;
-            font-weight: 600;
-            border-bottom: 2px solid #dee2e6;
-            color: #495057;
-        }
-        .table tbody tr {
-            transition: background-color 0.2s ease;
-        }
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
-        }
-        .alert {
-            border-radius: 8px;
-            border: none;
-            padding: 15px 20px;
-            font-weight: 500;
-        }
-        .alert-success {
-            background-color: #e8f7e9;
-            color: var(--success-color);
-        }
-        .alert-danger {
-            background-color: #fdecea;
-            color: var(--danger-color);
-        }
-        .alert-warning {
-            background-color: #fff3e0;
-            color: #ff6f00;
-        }
-        .form-control {
-            border-radius: 6px;
-            border: 1px solid #d7dce1;
-            padding: 0.7rem 1rem;
-        }
-        .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(61, 139, 253, 0.25);
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
         }
         .form-label {
             font-weight: 600;
-            color: #333;
-            margin-bottom: 0.8rem;
+            font-size: 0.82rem;
+            color: #475569;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
         }
-        .card {
-            border: none;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border-radius: 10px;
-            margin-bottom: 20px;
+
+        /* ── Table ── */
+        .table { margin-bottom: 0; font-size: 0.875rem; }
+        .table th {
+            background: #f8fafc;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            border-bottom: 2px solid var(--border);
+            padding: 13px 16px;
         }
-        .card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #dee2e6;
-            font-weight: 600;
-        }
-        .badge {
-            padding: 0.5rem 0.8rem;
-            font-weight: 600;
-            border-radius: 20px;
-        }
-        .badge-active {
-            background-color: #d4edda;
-            color: var(--success-color);
-        }
-        .badge-inactive {
-            background-color: #f8d7da;
-            color: var(--danger-color);
-        }
-        .badge-graduated {
-            background-color: #d1ecf1;
-            color: #0c5460;
-        }
+        .table td { padding: 13px 16px; vertical-align: middle; border-color: var(--border); }
+        .table tbody tr { transition: background 0.15s; }
+        .table tbody tr:hover { background: #f8fafc; }
+
+        /* ── Badges ── */
+        .badge { padding: 5px 11px; font-weight: 600; border-radius: 20px; font-size: 0.75rem; }
+        .badge-active  { background: #dcfce7; color: #15803d; }
+        .badge-inactive { background: #ffe4e6; color: #be123c; }
+        .badge-graduated { background: #ede9fe; color: #5b21b6; }
+
+        /* ── Alerts ── */
+        .alert { border: none; border-radius: 12px; padding: 14px 20px; font-weight: 500; font-size: 0.875rem; }
+        .alert-success { background: #f0fdf4; color: #15803d; border-left: 4px solid #16a34a; }
+        .alert-danger  { background: #fff1f2; color: #be123c; border-left: 4px solid #e11d48; }
+        .alert-warning { background: #fffbeb; color: #92400e; border-left: 4px solid #d97706; }
+        .invalid-feedback { font-size: 0.78rem; }
+
+        /* ── Footer ── */
         .footer {
-            background-color: #2c3e50;
-            color: white;
-            padding: 20px 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 16px 28px;
             text-align: center;
-            margin-top: 50px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
         }
-        .spinner-border {
-            width: 1.5rem;
-            height: 1.5rem;
+
+        /* ── Responsive ── */
+        @media (max-width: 991px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.open { display: block; }
+            .topbar { left: 0; }
+            .main-wrap { margin-left: 0; }
+        }
+        @media (max-width: 576px) {
+            .main-content { padding: 16px; }
+            .page-title { font-size: 1.2rem; }
+            .topbar { padding: 0 16px; }
         }
     </style>
+    @yield('styles')
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('students.index') }}">
-                <i class="fas fa-graduation-cap"></i> Student Management
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar">
+        <a class="sidebar-brand" href="{{ route('dashboard') }}">
+            <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div>
+                <div class="brand-text">Fantastic School</div>
+                <div class="brand-sub">Admin Panel</div>
+            </div>
+        </a>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">Main</div>
+            <a href="{{ route('dashboard') }}" class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-chart-pie"></i></span> Dashboard
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+            <a href="{{ route('students.index') }}" class="sidebar-link {{ request()->routeIs('students.*') && !request()->routeIs('students.create') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-users"></i></span> All Students
+            </a>
+            <a href="{{ route('students.create') }}" class="sidebar-link {{ request()->routeIs('students.create') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-user-plus"></i></span> Add Student
+            </a>
+            <a href="{{ route('students.export') }}" class="sidebar-link">
+                <span class="sl-icon"><i class="fas fa-file-csv"></i></span> Export CSV
+            </a>
+
+            <div class="nav-section">System</div>
+            <a href="{{ route('audit.index') }}" class="sidebar-link {{ request()->routeIs('audit.*') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-history"></i></span> Audit Logs
+            </a>
+            <a href="{{ route('backup.index') }}" class="sidebar-link {{ request()->routeIs('backup.*') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-database"></i></span> Backups
+            </a>
+            @if(Auth::user()->isAdmin())
+            <a href="{{ route('users.index') }}" class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-user-shield"></i></span> User Management
+            </a>
+            @endif
+            <a href="{{ route('api.docs') }}" class="sidebar-link {{ request()->routeIs('api.docs') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-code"></i></span> API Docs
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="su-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
+                <div>
+                    <div class="su-name">{{ Auth::user()->name }}</div>
+                    <div class="su-role">{{ ucfirst(Auth::user()->role ?? 'staff') }}</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ── Topbar ── -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('students.index') ? 'active' : '' }}" href="{{ route('students.index') }}">
-                            <i class="fas fa-list"></i> Students
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {{ request()->routeIs('students.create') ? 'active' : '' }}" href="{{ route('students.create') }}">
-                            <i class="fas fa-plus"></i> Add Student
-                        </a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle"></i> Menu
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{ route('audit.index') }}"><i class="fas fa-history"></i> Audit Logs</a></li>
-                            <li><a class="dropdown-item" href="{{ route('api.docs') }}"><i class="fas fa-code"></i> API Docs</a></li>
-                            <li><a class="dropdown-item" href="{{ route('backup.index') }}"><i class="fas fa-database"></i> Backups</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <form action="{{ route('logout') }}" method="POST" id="logout-form" style="display: none;">
-                                    @csrf
-                                </form>
-                                <a class="dropdown-item" href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                </a>
-                            </li>
-                        </ul>
+            <div class="topbar-breadcrumb d-none d-md-block">
+                <strong>@yield('title', 'Dashboard')</strong>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <a href="{{ route('students.create') }}" class="topbar-btn" title="Add Student">
+                <i class="fas fa-plus"></i>
+            </a>
+            <a href="{{ route('students.export') }}" class="topbar-btn" title="Export CSV">
+                <i class="fas fa-download"></i>
+            </a>
+            <div class="dropdown">
+                <a class="topbar-user dropdown-toggle" href="#" data-bs-toggle="dropdown" style="text-decoration:none;">
+                    <div class="tu-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
+                    <span class="tu-name d-none d-md-inline">{{ Auth::user()->name }}</span>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-1">
+                    <li><h6 class="dropdown-header">{{ Auth::user()->email }}</h6></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </button>
+                        </form>
                     </li>
                 </ul>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        @if ($errors->any())
-            <div class="container">
-                <div class="alert alert-danger">
-                    <h5><i class="fas fa-exclamation-circle"></i> Validation Errors</h5>
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
+    <!-- ── Main Wrap ── -->
+    <div class="main-wrap">
+        <main class="main-content">
+
+            {{-- Alerts --}}
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <strong>Please fix the following errors:</strong>
+                    <ul class="mb-0 mt-1">
+                        @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
-                </div>
-            </div>
-        @endif
-
-        @if (session('success'))
-            <div class="container">
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle"></i> {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
-            </div>
-        @endif
+            @endif
 
-                <div class="container-fluid">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <i class="fas fa-times-circle me-2"></i> {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+
             @yield('content')
-        </div>
+        </main>
+
+        <footer class="footer">
+            &copy; {{ date('Y') }} Fantastic School Admin &mdash; Student Management System
+        </footer>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container-fluid">
-            <p>&copy; 2026 Student Management System. All rights reserved.</p>
-        </div>
-    </footer>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        function confirmDelete(event, form, message = "Delete this item?") {
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const toggle  = document.getElementById('sidebarToggle');
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        });
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('open');
+        });
+
+        // Confirm delete helper
+        function confirmDelete(event, form, message = 'Delete this item?') {
             if (event) event.preventDefault();
             Swal.fire({
                 title: 'Are you sure?',
                 text: message,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#e74c3c',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, delete it!',
+                borderRadius: '16px'
+            }).then(result => { if (result.isConfirmed) form.submit(); });
         }
 
         function confirmAction(message, callback) {
@@ -303,15 +560,12 @@
                 text: message,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#e74c3c',
-                cancelButtonColor: '#6c757d',
+                confirmButtonColor: '#e11d48',
+                cancelButtonColor: '#64748b',
                 confirmButtonText: 'Yes, proceed!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    callback();
-                }
-            });
+            }).then(result => { if (result.isConfirmed) callback(); });
         }
     </script>
+    @yield('scripts')
 </body>
 </html>

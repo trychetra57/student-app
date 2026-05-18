@@ -458,6 +458,17 @@
                         </div>
                     </div>
 
+                    {{-- Monthly Trend Chart --}}
+                    <div class="col-12">
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <span class="chart-title"><i class="fas fa-chart-line text-primary me-2"></i>Monthly Enrollment Trend</span>
+                                <span class="chart-badge">Last 12 Months</span>
+                            </div>
+                            <canvas id="trendChart" height="80"></canvas>
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -564,38 +575,17 @@ document.addEventListener('DOMContentLoaded', function () {
             labels: ['Active', 'Inactive', 'Graduated'],
             datasets: [{
                 label: 'Students',
-                data: [
-                    {{ $stats['active_students'] }},
-                    {{ $stats['inactive_students'] }},
-                    {{ $stats['graduated_students'] }}
-                ],
-                backgroundColor: [
-                    'rgba(22,163,74,0.85)',
-                    'rgba(225,29,72,0.85)',
-                    'rgba(124,58,237,0.85)'
-                ],
-                borderRadius: 10,
-                borderSkipped: false,
-                borderWidth: 0,
+                data: [{{ $stats['active_students'] }}, {{ $stats['inactive_students'] }}, {{ $stats['graduated_students'] }}],
+                backgroundColor: ['rgba(22,163,74,0.85)','rgba(225,29,72,0.85)','rgba(124,58,237,0.85)'],
+                borderRadius: 10, borderSkipped: false, borderWidth: 0,
             }]
         },
         options: {
             responsive: true,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: ctx => ` ${ctx.parsed.y} students`
-                    }
-                }
-            },
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} students` } } },
             scales: {
                 x: { grid: { display: false }, ticks: { font: { weight: '600' } } },
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1, font: { size: 11 } },
-                    grid: { color: '#f1f5f9', drawBorder: false }
-                }
+                y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#f1f5f9' } }
             },
             animation: { duration: 1200, easing: 'easeOutQuart' }
         }
@@ -608,30 +598,49 @@ document.addEventListener('DOMContentLoaded', function () {
         type: 'doughnut',
         data: {
             labels: @json($gradeStats->pluck('grade')),
-            datasets: [{
-                data: @json($gradeStats->pluck('count')),
-                backgroundColor: [
-                    '#2563eb','#16a34a','#7c3aed','#ea580c',
-                    '#0891b2','#e11d48','#ca8a04','#64748b'
-                ],
-                borderWidth: 3,
-                borderColor: '#ffffff',
-                hoverOffset: 8
-            }]
+            datasets: [{ data: @json($gradeStats->pluck('count')),
+                backgroundColor: ['#2563eb','#16a34a','#7c3aed','#ea580c','#0891b2','#e11d48','#ca8a04','#64748b'],
+                borderWidth: 3, borderColor: '#ffffff', hoverOffset: 8 }]
         },
         options: {
-            responsive: true,
-            cutout: '65%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: { padding: 14, font: { size: 11, weight: '600' } }
-                }
-            },
+            responsive: true, cutout: '65%',
+            plugins: { legend: { position: 'bottom', labels: { padding: 14, font: { size: 11, weight: '600' } } } },
             animation: { duration: 1200, easing: 'easeOutQuart' }
         }
     });
     @endif
+
+    // ── Monthly Enrollment Trend ──
+    const trendCtx = document.getElementById('trendChart');
+    if (trendCtx) {
+        new Chart(trendCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: @json(collect($monthlyData)->pluck('month')),
+                datasets: [{
+                    label: 'New Students',
+                    data: @json(collect($monthlyData)->pluck('count')),
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37,99,235,0.08)',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#2563eb',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} new students` } } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 10 }, maxTicksLimit: 6 } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 11 } }, grid: { color: '#f1f5f9' } }
+                },
+                animation: { duration: 1400, easing: 'easeOutQuart' }
+            }
+        });
+    }
 });
 </script>
 
