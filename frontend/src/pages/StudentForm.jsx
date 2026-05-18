@@ -16,7 +16,8 @@ export default function StudentForm() {
         date_of_birth: '',
         guardian_name: '',
         guardian_phone: '',
-        status: 'active'
+        status: 'active',
+        profile_picture: null
     });
     
     const [loading, setLoading] = useState(isEditing);
@@ -53,11 +54,27 @@ export default function StudentForm() {
         e.preventDefault();
         setErrors({});
         
+        const submitData = new FormData();
+        Object.keys(formData).forEach(key => {
+            if (formData[key] !== null && formData[key] !== undefined) {
+                if (key === 'profile_picture' && formData[key] instanceof File) {
+                    submitData.append(key, formData[key]);
+                } else if (key !== 'profile_picture' && key !== 'profile_picture_url' && key !== 'documents') {
+                    submitData.append(key, formData[key]);
+                }
+            }
+        });
+
         try {
             if (isEditing) {
-                await api.put(`/students/${id}`, formData);
+                submitData.append('_method', 'PUT');
+                await api.post(`/students/${id}`, submitData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
             } else {
-                await api.post('/students', formData);
+                await api.post('/students', submitData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
             }
             navigate('/students');
         } catch (error) {
@@ -138,36 +155,45 @@ export default function StudentForm() {
                                 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Name</label>
-                                    <input type="text" name="name" value={formData.name} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    <input type="text" name="name" value={formData.name || ''} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                     {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name[0]}</p>}
                                 </div>
 
                                 <div>
+                                    <label className="block text-sm font-medium text-gray-700">Profile Picture</label>
+                                    {formData.profile_picture_url && (
+                                        <img src={formData.profile_picture_url} alt="Profile" className="h-12 w-12 object-cover rounded-full mb-2 mt-1" />
+                                    )}
+                                    <input type="file" name="profile_picture" onChange={(e) => setFormData(prev => ({ ...prev, profile_picture: e.target.files[0] }))} accept="image/*" className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                                    {errors.profile_picture && <p className="mt-2 text-sm text-red-600">{errors.profile_picture[0]}</p>}
+                                </div>
+
+                                <div>
                                     <label className="block text-sm font-medium text-gray-700">Email</label>
-                                    <input type="email" name="email" value={formData.email} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    <input type="email" name="email" value={formData.email || ''} onChange={handleChange} required className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                     {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email[0]}</p>}
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Phone</label>
-                                    <input type="text" name="phone" value={formData.phone} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    <input type="text" name="phone" value={formData.phone || ''} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                     {errors.phone && <p className="mt-2 text-sm text-red-600">{errors.phone[0]}</p>}
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Date of Birth</label>
-                                    <input type="date" name="date_of_birth" value={formData.date_of_birth} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    <input type="date" name="date_of_birth" value={formData.date_of_birth || ''} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                     {errors.date_of_birth && <p className="mt-2 text-sm text-red-600">{errors.date_of_birth[0]}</p>}
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Grade</label>
-                                    <input type="text" name="grade" value={formData.grade} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    <input type="text" name="grade" value={formData.grade || ''} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Status</label>
-                                    <select name="status" value={formData.status} onChange={handleChange} className="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                                    <select name="status" value={formData.status || 'active'} onChange={handleChange} className="mt-1 block w-full bg-white border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
                                         <option value="active">Active</option>
                                         <option value="inactive">Inactive</option>
                                         <option value="graduated">Graduated</option>
@@ -176,17 +202,17 @@ export default function StudentForm() {
 
                                 <div className="sm:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700">Address</label>
-                                    <textarea name="address" value={formData.address} onChange={handleChange} rows="3" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
+                                    <textarea name="address" value={formData.address || ''} onChange={handleChange} rows="3" className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"></textarea>
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Guardian Name</label>
-                                    <input type="text" name="guardian_name" value={formData.guardian_name} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    <input type="text" name="guardian_name" value={formData.guardian_name || ''} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700">Guardian Phone</label>
-                                    <input type="text" name="guardian_phone" value={formData.guardian_phone} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
+                                    <input type="text" name="guardian_phone" value={formData.guardian_phone || ''} onChange={handleChange} className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" />
                                 </div>
                             </div>
 

@@ -12,7 +12,7 @@ const StatusPill = ({ status }) => {
     return (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', borderRadius: '999px', background: c.bg, color: c.text, fontSize: '12px', fontWeight: '600' }}>
             <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: c.dot, flexShrink: 0 }} />
-            {status?.charAt(0).toUpperCase() + status?.slice(1)}
+            {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown'}
         </span>
     );
 };
@@ -86,7 +86,7 @@ export default function Students() {
 
     const SortIcon = ({ col }) => (
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ width: '12px', marginLeft: '4px', color: sortBy === col ? '#6366f1' : '#d1d5db' }}>
-            {sortBy === col && sortDir === 'asc' ? <path d="M5 15l7-7 7 7"/> : <path d="M19 9l-7 7-7-7"/>}
+            {sortBy === col && sortDir === 'asc' ? <path d="M5 15l7-7 7 7" /> : <path d="M19 9l-7 7-7-7" />}
         </svg>
     );
 
@@ -101,6 +101,7 @@ export default function Students() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             {/* Page Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+
                 <div>
                     <h1 style={{ margin: 0, fontSize: '22px', fontWeight: '800', color: '#1a1d2e' }}>Students</h1>
                     <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#9ca3af' }}>
@@ -115,7 +116,7 @@ export default function Students() {
                         cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
                     }}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '15px' }}>
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
                         </svg>
                         Export CSV
                     </button>
@@ -130,12 +131,13 @@ export default function Students() {
                 </div>
             </div>
 
+
             {/* Filters */}
             <div style={{ background: 'white', borderRadius: '16px', padding: '16px 20px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                 <form onSubmit={handleSearch} style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
                     <div style={{ flex: '1 1 240px', position: 'relative' }}>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '15px', position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }}>
-                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" />
                         </svg>
                         <input
                             type="text" placeholder="Search by name, email, phone, grade..."
@@ -207,7 +209,7 @@ export default function Students() {
                         <thead>
                             <tr style={{ background: '#f9fafb' }}>
                                 <th style={{ width: '48px', padding: '12px 16px' }} />
-                                {[['Name','name'],['Email','email'],['Phone',null],['Grade','grade'],['Status','status'],['Joined','created_at']].map(([label, col]) => (
+                                {[['Name', 'name'], ['Email', 'email'], ['Phone', null], ['Grade', 'grade'], ['Status', 'status'], ['Joined', 'created_at']].map(([label, col]) => (
                                     <th key={label} style={headerStyle(col)} onClick={() => col && handleSort(col)}>
                                         <span style={{ display: 'inline-flex', alignItems: 'center' }}>
                                             {label}{col && <SortIcon col={col} />}
@@ -236,12 +238,16 @@ export default function Students() {
                                     </td>
                                     <td style={{ padding: '14px 16px' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                                            <div style={{
-                                                width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
-                                                background: `hsl(${(i * 47 + 200) % 360}, 65%, 55%)`,
-                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                color: 'white', fontSize: '13px', fontWeight: '700',
-                                            }}>{student.name?.[0]?.toUpperCase()}</div>
+                                            {student.profile_picture_url ? (
+                                                <img src={student.profile_picture_url} alt={student.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                                            ) : (
+                                                <div style={{
+                                                    width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
+                                                    background: `hsl(${(i * 47 + 200) % 360}, 65%, 55%)`,
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    color: 'white', fontSize: '13px', fontWeight: '700',
+                                                }}>{student.name?.[0]?.toUpperCase()}</div>
+                                            )}
                                             <span style={{ fontSize: '14px', fontWeight: '600', color: '#1a1d2e' }}>{student.name}</span>
                                         </div>
                                     </td>

@@ -13,7 +13,7 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <form method="POST" action="{{ route('students.store') }}" novalidate>
+            <form method="POST" action="{{ route('students.store') }}" enctype="multipart/form-data" novalidate>
                 @csrf
 
                 <!-- Basic Information -->
@@ -23,6 +23,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
+
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" 
@@ -98,6 +99,15 @@
                                     </option>
                                 </select>
                                 @error('status')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-12">
+                                <label for="profile_picture" class="form-label">Profile Picture</label>
+                                <input type="file" class="form-control @error('profile_picture') is-invalid @enderror" 
+                                       id="profile_picture" name="profile_picture" accept="image/*">
+                                @error('profile_picture')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

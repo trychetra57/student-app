@@ -21,6 +21,7 @@ class Student extends Model
         'guardian_name',
         'guardian_phone',
         'status',
+        'profile_picture',
     ];
 
     protected $casts = [
@@ -29,6 +30,8 @@ class Student extends Model
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    protected $appends = ['profile_picture_url'];
 
     // Relationships
     public function documents(): HasMany
@@ -100,5 +103,13 @@ class Student extends Model
             'graduated' => '<span class="badge badge-info">Graduated</span>',
         ];
         return $badges[$this->status] ?? '';
+    }
+
+    public function getProfilePictureUrlAttribute()
+    {
+        if ($this->profile_picture) {
+            return asset('storage/' . $this->profile_picture);
+        }
+        return null; // Or return a default avatar URL
     }
 }

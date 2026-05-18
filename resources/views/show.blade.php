@@ -190,6 +190,11 @@
                     <i class="fas fa-info-circle"></i> Quick Info
                 </div>
                 <div class="card-body">
+                    @if($student->profile_picture_url)
+                        <div class="text-center mb-3">
+                            <img src="{{ $student->profile_picture_url }}" alt="{{ $student->name }}" class="rounded-circle shadow-sm" style="width: 120px; height: 120px; object-fit: cover;">
+                        </div>
+                    @endif
                     <p><strong>Student ID:</strong> #{{ $student->id }}</p>
                     <hr>
                     <div class="d-grid gap-2">

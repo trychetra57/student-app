@@ -13,7 +13,7 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <form method="POST" action="{{ route('students.update', $student) }}" novalidate>
+            <form method="POST" action="{{ route('students.update', $student) }}" enctype="multipart/form-data" novalidate>
                 @csrf
                 @method('PUT')
 
@@ -24,6 +24,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
+
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror" 
@@ -93,6 +94,20 @@
                                     <option value="graduated" {{ old('status', $student->status) == 'graduated' ? 'selected' : '' }}>Graduated</option>
                                 </select>
                                 @error('status')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-12">
+                                <label for="profile_picture" class="form-label">Profile Picture</label>
+                                @if($student->profile_picture_url)
+                                    <div class="mb-2">
+                                        <img src="{{ $student->profile_picture_url }}" alt="Profile" class="rounded-circle shadow-sm" style="width: 64px; height: 64px; object-fit: cover;">
+                                    </div>
+                                @endif
+                                <input type="file" class="form-control @error('profile_picture') is-invalid @enderror" 
+                                       id="profile_picture" name="profile_picture" accept="image/*">
+                                @error('profile_picture')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

@@ -19,7 +19,7 @@ const StatusPill = ({ status }) => {
     return (
         <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '999px', background: c.bg, color: c.text, fontSize: '13px', fontWeight: '700' }}>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: c.dot }} />
-            {status?.charAt(0).toUpperCase() + status?.slice(1)}
+            {status ? status.charAt(0).toUpperCase() + status.slice(1) : 'Unknown'}
         </span>
     );
 };
@@ -58,8 +58,8 @@ export default function StudentView() {
         </div>
     );
 
-    const avatarColor = `hsl(${(student.name.charCodeAt(0) * 17) % 360}, 60%, 50%)`;
-    const age = student.date_of_birth
+    const avatarColor = `hsl(${((student?.name?.charCodeAt(0) || 0) * 17) % 360}, 60%, 50%)`;
+    const age = student?.date_of_birth
         ? Math.floor((new Date() - new Date(student.date_of_birth)) / (365.25 * 24 * 3600 * 1000))
         : null;
 
@@ -71,7 +71,7 @@ export default function StudentView() {
                 <span>/</span>
                 <Link to="/students" style={{ color: '#9ca3af', textDecoration: 'none' }}>Students</Link>
                 <span>/</span>
-                <span style={{ color: '#374151', fontWeight: '500' }}>{student.name}</span>
+                <span style={{ color: '#374151', fontWeight: '500' }}>{student?.name}</span>
             </div>
 
             {/* Profile Header Card */}
@@ -82,15 +82,22 @@ export default function StudentView() {
             }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                     {/* Avatar */}
-                    <div style={{
-                        width: '80px', height: '80px', borderRadius: '50%', flexShrink: 0,
-                        background: `linear-gradient(135deg, ${avatarColor}, ${avatarColor}bb)`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: 'white', fontSize: '32px', fontWeight: '800',
-                        boxShadow: `0 8px 24px ${avatarColor}55`,
-                    }}>{student.name[0].toUpperCase()}</div>
+                    {student?.profile_picture_url ? (
+                        <img src={student.profile_picture_url} alt={student?.name} style={{
+                            width: '80px', height: '80px', borderRadius: '50%', flexShrink: 0, objectFit: 'cover',
+                            boxShadow: `0 8px 24px rgba(0,0,0,0.1)`,
+                        }} />
+                    ) : (
+                        <div style={{
+                            width: '80px', height: '80px', borderRadius: '50%', flexShrink: 0,
+                            background: `linear-gradient(135deg, ${avatarColor}, ${avatarColor}bb)`,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            color: 'white', fontSize: '32px', fontWeight: '800',
+                            boxShadow: `0 8px 24px ${avatarColor}55`,
+                        }}>{student?.name?.[0]?.toUpperCase() || '?'}</div>
+                    )}
                     <div>
-                        <h1 style={{ margin: '0 0 6px', fontSize: '22px', fontWeight: '800', color: '#111827' }}>{student.name}</h1>
+                        <h1 style={{ margin: '0 0 6px', fontSize: '22px', fontWeight: '800', color: '#111827' }}>{student?.name}</h1>
                         <p style={{ margin: '0 0 10px', fontSize: '14px', color: '#6b7280' }}>{student.email}</p>
                         <StatusPill status={student.status} />
                     </div>

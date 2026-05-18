@@ -94,9 +94,14 @@ class StudentController extends Controller
             'guardian_name' => 'nullable|string|max:255',
             'guardian_phone' => 'nullable|string|max:50',
             'status' => 'nullable|in:active,inactive,graduated',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $data['status'] = $data['status'] ?? 'active';
+
+        if ($request->hasFile('profile_picture')) {
+            $data['profile_picture'] = $request->file('profile_picture')->store('student_profiles', 'public');
+        }
 
         $student = Student::create($data);
 
@@ -131,7 +136,20 @@ class StudentController extends Controller
             'guardian_name' => 'nullable|string|max:255',
             'guardian_phone' => 'nullable|string|max:50',
             'status' => 'sometimes|required|in:active,inactive,graduated',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
+
+        if ($request->hasFile('profile_picture')) {
+            if ($student->profile_picture) {
+                Storage::disk('public')->delete($student->profile_picture);
+            }
+            $data['profile_picture'] = $request->file('profile_picture')->store('student_profiles', 'public');
+        } elseif ($request->has('remove_profile_picture') && $request->remove_profile_picture == 'true') {
+            if ($student->profile_picture) {
+                Storage::disk('public')->delete($student->profile_picture);
+                $data['profile_picture'] = null;
+            }
+        }
 
         $student->update($data);
         
@@ -167,6 +185,10 @@ class StudentController extends Controller
         foreach ($student->documents as $document) {
             Storage::delete($document->file_path);
             $document->delete();
+        }
+
+        if ($student->profile_picture) {
+            Storage::disk('public')->delete($student->profile_picture);
         }
 
         $student->forceDelete();
@@ -215,6 +237,9 @@ class StudentController extends Controller
             foreach ($student->documents as $document) {
                 Storage::delete($document->file_path);
                 $document->delete();
+            }
+            if ($student->profile_picture) {
+                Storage::disk('public')->delete($student->profile_picture);
             }
             $student->forceDelete();
             $this->logAudit('force_delete', $student, $oldValues, null);
