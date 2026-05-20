@@ -65,7 +65,7 @@ class StudentController extends Controller
             // Placeholders for features not yet implemented to match UI request
             'fees_collection' => 0,
             'banks' => 0,
-            'classes' => 0,
+            'classes' => \App\Models\SchoolClass::count(),
             'hostels' => 0,
             'exam_results' => 0,
             'events' => 0,
