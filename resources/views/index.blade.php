@@ -133,7 +133,11 @@
                 <td><input type="checkbox" value="{{ $student->id }}" class="form-check-input student-checkbox"></td>
                 <td>
                     <div class="d-flex align-items-center gap-3">
-                        <div class="student-avatar">{{ strtoupper(substr($student->name,0,2)) }}</div>
+                        @if($student->profile_picture_url)
+                            <img src="{{ $student->profile_picture_url }}" alt="{{ $student->name }}" class="student-avatar" style="object-fit:cover;">
+                        @else
+                            <div class="student-avatar">{{ strtoupper(substr($student->name,0,2)) }}</div>
+                        @endif
                         <div>
                             <div style="font-weight:600;">{{ $student->name }}</div>
                             <div class="d-lg-none" style="font-size:.75rem;color:#94a3b8;">{{ $student->grade??'—' }}</div>

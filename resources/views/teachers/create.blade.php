@@ -13,7 +13,7 @@
 
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ route('teachers.store') }}">
+            <form method="POST" action="{{ route('teachers.store') }}" enctype="multipart/form-data">
                 @csrf
 
                 <div class="section-title">Personal Info</div>
@@ -47,6 +47,12 @@
                         <input type="text" name="qualification" class="form-control @error('qualification') is-invalid @enderror"
                                value="{{ old('qualification') }}" placeholder="e.g. Master's in Mathematics">
                         @error('qualification')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-12">
+                        <label for="profile_picture" class="form-label">Profile Picture</label>
+                        <input type="file" class="form-control @error('profile_picture') is-invalid @enderror" 
+                               id="profile_picture" name="profile_picture" accept="image/*">
+                        @error('profile_picture')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Status</label>

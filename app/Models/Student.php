@@ -31,6 +31,8 @@ class Student extends Model
         'deleted_at' => 'datetime',
     ];
 
+
+
     protected $appends = ['profile_picture_url'];
 
     // Relationships

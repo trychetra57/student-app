@@ -135,7 +135,11 @@
                             <td class="text-muted" style="font-size:.75rem;">#{{ $teacher->id }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-2">
-                                    <div class="teacher-avatar">{{ strtoupper(substr($teacher->name,0,2)) }}</div>
+                                    @if($teacher->profile_picture_url)
+                                        <img src="{{ $teacher->profile_picture_url }}" alt="{{ $teacher->name }}" class="teacher-avatar" style="object-fit:cover;">
+                                    @else
+                                        <div class="teacher-avatar">{{ strtoupper(substr($teacher->name,0,2)) }}</div>
+                                    @endif
                                     <div>
                                         <div class="fw-600">{{ $teacher->name }}</div>
                                         <div class="text-muted" style="font-size:.75rem;">{{ $teacher->qualification ?? '—' }}</div>

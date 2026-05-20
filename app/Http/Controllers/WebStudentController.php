@@ -83,9 +83,15 @@ class WebStudentController extends Controller
             'guardian_name'  => 'nullable|string|max:255',
             'guardian_phone' => 'nullable|string|max:50',
             'status'         => 'nullable|in:active,inactive,graduated',
+            'profile_picture'=> 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $data['status'] = $data['status'] ?? 'active';
+
+        if ($request->hasFile('profile_picture')) {
+            $data['profile_picture'] = $request->file('profile_picture')->store('student_profiles', 'public');
+        }
+
         $student = Student::create($data);
 
         // Send welcome email (gracefully fails if mail not configured)
@@ -121,7 +127,20 @@ class WebStudentController extends Controller
             'guardian_name'  => 'nullable|string|max:255',
             'guardian_phone' => 'nullable|string|max:50',
             'status'         => 'sometimes|required|in:active,inactive,graduated',
+            'profile_picture'=> 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
+
+        if ($request->hasFile('profile_picture')) {
+            if ($student->profile_picture) {
+                Storage::disk('public')->delete($student->profile_picture);
+            }
+            $data['profile_picture'] = $request->file('profile_picture')->store('student_profiles', 'public');
+        } elseif ($request->has('remove_profile_picture') && $request->remove_profile_picture == 'true') {
+            if ($student->profile_picture) {
+                Storage::disk('public')->delete($student->profile_picture);
+                $data['profile_picture'] = null;
+            }
+        }
 
         $student->update($data);
         return redirect()->route('students.show', $student)->with('success', 'Student updated successfully!');

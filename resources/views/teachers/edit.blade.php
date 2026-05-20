@@ -15,7 +15,7 @@
 
     <div class="card">
         <div class="card-body">
-            <form method="POST" action="{{ route('teachers.update', $teacher) }}">
+            <form method="POST" action="{{ route('teachers.update', $teacher) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
 
@@ -50,6 +50,17 @@
                         <input type="text" name="qualification" class="form-control @error('qualification') is-invalid @enderror"
                                value="{{ old('qualification', $teacher->qualification) }}">
                         @error('qualification')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="col-12">
+                        <label for="profile_picture" class="form-label">Profile Picture</label>
+                        @if($teacher->profile_picture_url)
+                            <div class="mb-2">
+                                <img src="{{ $teacher->profile_picture_url }}" alt="Profile" class="rounded-circle shadow-sm" style="width: 64px; height: 64px; object-fit: cover;">
+                            </div>
+                        @endif
+                        <input type="file" class="form-control @error('profile_picture') is-invalid @enderror" 
+                               id="profile_picture" name="profile_picture" accept="image/*">
+                        @error('profile_picture')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">Status</label>

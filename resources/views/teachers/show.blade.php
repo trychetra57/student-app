@@ -27,9 +27,13 @@
             <div class="profile-hero card mb-4">
                 <div class="card-body">
                     <div class="d-flex align-items-center gap-4 flex-wrap">
-                        <div class="profile-avatar">
-                            {{ strtoupper(substr($teacher->name, 0, 2)) }}
-                        </div>
+                        @if($teacher->profile_picture_url)
+                            <img src="{{ $teacher->profile_picture_url }}" alt="{{ $teacher->name }}" class="profile-avatar" style="object-fit:cover;">
+                        @else
+                            <div class="profile-avatar">
+                                {{ strtoupper(substr($teacher->name, 0, 2)) }}
+                            </div>
+                        @endif
                         <div class="flex-fill">
                             <h2 class="profile-name mb-1">{{ $teacher->name }}</h2>
                             <div class="profile-sub mb-2">

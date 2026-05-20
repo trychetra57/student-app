@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Teacher;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class WebTeacherController extends Controller
 {
@@ -76,9 +77,15 @@ class WebTeacherController extends Controller
             'joined_date'   => 'nullable|date',
             'qualification' => 'nullable|string|max:255',
             'status'        => 'nullable|in:active,inactive,on_leave',
+            'profile_picture'=> 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
         $data['status'] = $data['status'] ?? 'active';
+
+        if ($request->hasFile('profile_picture')) {
+            $data['profile_picture'] = $request->file('profile_picture')->store('teacher_profiles', 'public');
+        }
+
         $teacher = Teacher::create($data);
 
         return redirect()->route('teachers.index')
@@ -108,7 +115,20 @@ class WebTeacherController extends Controller
             'joined_date'   => 'nullable|date',
             'qualification' => 'nullable|string|max:255',
             'status'        => 'sometimes|required|in:active,inactive,on_leave',
+            'profile_picture'=> 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
+
+        if ($request->hasFile('profile_picture')) {
+            if ($teacher->profile_picture) {
+                Storage::disk('public')->delete($teacher->profile_picture);
+            }
+            $data['profile_picture'] = $request->file('profile_picture')->store('teacher_profiles', 'public');
+        } elseif ($request->has('remove_profile_picture') && $request->remove_profile_picture == 'true') {
+            if ($teacher->profile_picture) {
+                Storage::disk('public')->delete($teacher->profile_picture);
+                $data['profile_picture'] = null;
+            }
+        }
 
         $teacher->update($data);
         return redirect()->route('teachers.show', $teacher)

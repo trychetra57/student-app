@@ -14,13 +14,18 @@ class Teacher extends Model
     protected $fillable = [
         'name', 'email', 'phone', 'subject', 'department',
         'address', 'date_of_birth', 'joined_date',
-        'qualification', 'status',
+        'qualification', 'status', 'profile_picture',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
         'joined_date'   => 'date',
     ];
+
+    public function getProfilePictureUrlAttribute()
+    {
+        return $this->profile_picture ? asset('storage/' . $this->profile_picture) : null;
+    }
 
     /**
      * Calculate age from date_of_birth.
