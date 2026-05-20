@@ -357,6 +357,14 @@
                     <div class="stat-trend"><i class="fas fa-paperclip"></i> Uploaded</div>
                 </div>
             </div>
+            <div class="col-6 col-md-4 col-lg-2">
+                <div class="stat-card sc-blue">
+                    <div class="icon-wrap" style="background: linear-gradient(135deg,#8b5cf6,#d946ef)"><i class="fas fa-door-open"></i></div>
+                    <div class="stat-num counter" data-target="{{ $stats['total_classes'] ?? 0 }}">0</div>
+                    <div class="stat-label">Total Classes</div>
+                    <div class="stat-trend"><i class="fas fa-chalkboard"></i> Scheduled</div>
+                </div>
+            </div>
         </div>
     </div>
 

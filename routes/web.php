@@ -6,6 +6,7 @@ use App\Http\Controllers\WebAuditController;
 use App\Http\Controllers\WebBackupController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebTeacherController;
+use App\Http\Controllers\WebSchoolClassController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('login'));
@@ -59,4 +60,7 @@ Route::middleware('auth')->group(function () {
 
     // Teachers CRUD
     Route::resource('teachers', WebTeacherController::class);
+
+    // Classes CRUD
+    Route::resource('classes', WebSchoolClassController::class)->parameters(['classes' => 'class']);
 });
