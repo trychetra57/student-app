@@ -27,8 +27,17 @@
                         <div class="col-md-6">
                             <label class="form-label">Role <span class="text-danger">*</span></label>
                             <select name="role" class="form-select @error('role') is-invalid @enderror">
-                                @foreach(['admin','teacher','staff','student'] as $r)
-                                    <option value="{{ $r }}" {{ old('role',$user->role)==$r?'selected':'' }}>{{ ucfirst($r) }}</option>
+                                @php
+                                    $roles = ['admin','teacher','staff','student'];
+                                    if(auth()->user()->isSuperAdmin()) {
+                                        array_unshift($roles, 'super_admin');
+                                    } elseif($user->role === 'super_admin') {
+                                        // If editing a super admin but we're not one (shouldn't happen due to controller logic, but just in case)
+                                        $roles[] = 'super_admin';
+                                    }
+                                @endphp
+                                @foreach($roles as $r)
+                                    <option value="{{ $r }}" {{ old('role',$user->role)==$r?'selected':'' }}>{{ ucwords(str_replace('_', ' ', $r)) }}</option>
                                 @endforeach
                             </select>
                             @error('role')<div class="invalid-feedback">{{ $message }}</div>@enderror

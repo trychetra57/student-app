@@ -178,6 +178,8 @@
                         <select class="form-select @error('role') is-invalid @enderror" 
                                 id="role" name="role" required>
                             <option value="">Select your role...</option>
+                            <option value="super_admin" {{ old('role') == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
+                            <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
                             <option value="staff" {{ old('role') == 'staff' ? 'selected' : '' }}>Staff</option>
                             <option value="teacher" {{ old('role') == 'teacher' ? 'selected' : '' }}>Teacher</option>
                         </select>
@@ -188,9 +190,15 @@
 
                     <div class="form-group">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                               id="password" name="password" 
-                               placeholder="••••••••" required>
+                        <div class="input-group">
+                            <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                                   id="password" name="password" required>
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword"
+                                    style="border-color: #d7dce1; background: #f8f9fa;"
+                                    onclick="toggleVisibility('password', 'toggleIcon')" title="Show/Hide password">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
                         <div class="password-requirements">
                             <strong>Password must contain:</strong>
                             <ul>
@@ -204,9 +212,15 @@
 
                     <div class="form-group">
                         <label for="password_confirmation" class="form-label">Confirm Password</label>
-                        <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" 
-                               id="password_confirmation" name="password_confirmation" 
-                               placeholder="••••••••" required>
+                        <div class="input-group">
+                            <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" 
+                                   id="password_confirmation" name="password_confirmation" required>
+                            <button class="btn btn-outline-secondary" type="button" id="togglePasswordConfirm"
+                                    style="border-color: #d7dce1; background: #f8f9fa;"
+                                    onclick="toggleVisibility('password_confirmation', 'toggleIconConfirm')" title="Show/Hide password">
+                                <i class="fas fa-eye" id="toggleIconConfirm"></i>
+                            </button>
+                        </div>
                         @error('password_confirmation')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
@@ -229,5 +243,20 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleVisibility(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>

@@ -154,13 +154,16 @@ class WebStudentController extends Controller
 
     public function deleteAll()
     {
+        if (!auth()->user()->isSuperAdmin()) abort(403, 'Only Super Admin can delete all students');
         $count = Student::count();
-        Student::query()->delete();
+        // Use each()->delete() so SoftDeletes trait sets deleted_at correctly
+        Student::each(fn($s) => $s->delete());
         return redirect()->route('students.index')->with('success', "Deleted all {$count} students.");
     }
 
     public function bulkDelete(Request $request)
     {
+        if (!auth()->user()->isAdmin()) abort(403, 'Unauthorized access');
         $ids = $request->input('student_ids', []);
         if (empty($ids)) return redirect()->back()->with('error','No students selected.');
         $count = Student::whereIn('id', $ids)->delete();
@@ -169,6 +172,7 @@ class WebStudentController extends Controller
 
     public function bulkForceDelete(Request $request)
     {
+        if (!auth()->user()->isSuperAdmin()) abort(403, 'Only Super Admin can force delete students');
         $ids = $request->input('student_ids', []);
         if (empty($ids)) return redirect()->back()->with('error','No students selected.');
         $students = Student::withTrashed()->whereIn('id', $ids)->get();

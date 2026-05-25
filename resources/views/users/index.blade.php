@@ -15,8 +15,12 @@
             <label class="form-label">Role</label>
             <select name="role" class="form-select">
                 <option value="">All Roles</option>
-                @foreach(['admin','teacher','staff','student'] as $r)
-                    <option value="{{ $r }}" {{ request('role')==$r?'selected':'' }}>{{ ucfirst($r) }}</option>
+                @php
+                    $searchRoles = ['admin','teacher','staff','student'];
+                    if(auth()->user()->isSuperAdmin()) array_unshift($searchRoles, 'super_admin');
+                @endphp
+                @foreach($searchRoles as $r)
+                    <option value="{{ $r }}" {{ request('role')==$r?'selected':'' }}>{{ ucwords(str_replace('_', ' ', $r)) }}</option>
                 @endforeach
             </select>
         </div>
@@ -59,10 +63,10 @@
                 </td>
                 <td>
                     @php
-                        $roleColors = ['admin'=>['#fef3c7','#92400e'],'teacher'=>['#ede9fe','#5b21b6'],'staff'=>['#dbeafe','#1d4ed8'],'student'=>['#dcfce7','#15803d']];
+                        $roleColors = ['super_admin'=>['#fecaca','#991b1b'],'admin'=>['#fef3c7','#92400e'],'teacher'=>['#ede9fe','#5b21b6'],'staff'=>['#dbeafe','#1d4ed8'],'student'=>['#dcfce7','#15803d']];
                         $rc = $roleColors[$user->role] ?? ['#f1f5f9','#475569'];
                     @endphp
-                    <span style="background:{{ $rc[0] }};color:{{ $rc[1] }};padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;">{{ ucfirst($user->role ?? 'staff') }}</span>
+                    <span style="background:{{ $rc[0] }};color:{{ $rc[1] }};padding:4px 12px;border-radius:20px;font-size:.75rem;font-weight:700;">{{ ucwords(str_replace('_', ' ', $user->role ?? 'staff')) }}</span>
                 </td>
                 <td class="d-none d-md-table-cell">
                     @if($user->is_active)
@@ -77,15 +81,17 @@
                         <a href="{{ route('users.edit',$user) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
                         <form method="POST" action="{{ route('users.toggle',$user) }}" class="d-inline">
                             @csrf
-                            <button class="btn btn-sm {{ $user->is_active ? 'btn-outline-warning' : 'btn-outline-success' }}" title="{{ $user->is_active ? 'Deactivate' : 'Activate' }}">
+                            <button class="btn btn-sm {{ $user->is_active ? 'btn-outline-primary' : 'btn-outline-success' }}" title="{{ $user->is_active ? 'Deactivate' : 'Activate' }}">
                                 <i class="fas fa-{{ $user->is_active ? 'pause' : 'play' }}"></i>
                             </button>
                         </form>
-                        @if($user->id !== auth()->id())
+                        @if($user->id !== auth()->id() && (!$user->isSuperAdmin() || auth()->user()->isSuperAdmin()))
                         <form method="POST" action="{{ route('users.destroy',$user) }}" class="d-inline" onsubmit="confirmDelete(event,this,'Delete user {{ addslashes($user->name) }}?');">
                             @csrf @method('DELETE')
                             <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></button>
                         </form>
+                        @else
+                        <button class="btn btn-sm btn-outline-danger disabled" disabled title="Delete"><i class="fas fa-trash"></i></button>
                         @endif
                     </div>
                 </td>

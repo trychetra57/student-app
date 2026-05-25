@@ -43,7 +43,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
-            'role' => 'nullable|in:staff,teacher',
+            'role' => 'nullable|in:super_admin,admin,staff,teacher',
         ]);
         
         $role = $request->role ?? 'staff';

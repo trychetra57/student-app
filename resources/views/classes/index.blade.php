@@ -2,6 +2,52 @@
 
 @section('title', 'Classes - BelTei University Admin')
 
+@section('styles')
+<style>
+.stat-mini {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.stat-mini:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(79,70,229,.1);
+}
+.stat-mini-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+.stat-mini-val   { font-size: 1.5rem; font-weight: 800; color: #1e293b; line-height: 1; }
+.stat-mini-label { font-size: .72rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
+
+.sort-link { color: inherit; text-decoration: none; }
+.sort-link:hover { color: var(--primary); }
+
+.class-avatar {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #4f46e5, #818cf8);
+    color: white;
+    font-weight: 700;
+    font-size: .85rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+}
+
+.table > :not(caption) > * > * { padding: 14px 16px; vertical-align: middle; }
+.table thead th { background: #f8fafc; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: #64748b; border-bottom: 2px solid #e2e8f0; }
+</style>
+@endsection
+
 @section('content')
 <div class="container-lg">
     <div class="page-header">
@@ -15,7 +61,7 @@
     <div class="row g-3 mb-4">
         <div class="col-6 col-md-4">
             <div class="stat-mini">
-                <div class="stat-mini-icon" style="background:linear-gradient(135deg,#2563eb,#60a5fa)">
+                <div class="stat-mini-icon" style="background:linear-gradient(135deg,#4f46e5,#818cf8)">
                     <i class="fas fa-door-open"></i>
                 </div>
                 <div>
@@ -53,15 +99,18 @@
         <div class="card-body" style="padding:16px 24px;">
             <form method="GET" action="{{ route('classes.index') }}" class="row g-2 align-items-end">
                 <div class="col-12 col-md-6">
-                    <input type="text" name="search" class="form-control" placeholder="&#xf002; Search class name or room number…"
-                        style="font-family:'Inter',FontAwesome,sans-serif;"
-                        value="{{ request('search') }}">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="search" class="form-control border-start-0"
+                               placeholder="Search class name or room number…"
+                               value="{{ request('search') }}">
+                    </div>
                 </div>
                 <div class="col-6 col-md-2">
                     <select name="status" class="form-select">
-                        <option value="all" {{ request('status','all')==='all'?'selected':'' }}>All Status</option>
-                        <option value="active"   {{ request('status')==='active'  ?'selected':'' }}>Active</option>
-                        <option value="inactive" {{ request('status')==='inactive'?'selected':'' }}>Inactive</option>
+                        <option value="all"     {{ request('status','all')==='all'    ?'selected':'' }}>All Status</option>
+                        <option value="active"   {{ request('status')==='active'      ?'selected':'' }}>Active</option>
+                        <option value="inactive" {{ request('status')==='inactive'    ?'selected':'' }}>Inactive</option>
                     </select>
                 </div>
                 <div class="col-6 col-md-2">
@@ -90,7 +139,7 @@
                             <th>#</th>
                             <th>
                                 <a href="{{ request()->fullUrlWithQuery(['sort'=>'name','direction'=>request('direction')==='asc'?'desc':'asc']) }}" class="sort-link">
-                                    Name <i class="fas fa-sort{{ request('sort')==='name'?(request('direction')==='asc'?'-up':'-down'):'' }}"></i>
+                                    Class Name <i class="fas fa-sort{{ request('sort')==='name'?(request('direction')==='asc'?'-up':'-down'):'' }}"></i>
                                 </a>
                             </th>
                             <th>
@@ -99,7 +148,11 @@
                                 </a>
                             </th>
                             <th>Teacher</th>
-                            <th>Capacity</th>
+                            <th>
+                                <a href="{{ request()->fullUrlWithQuery(['sort'=>'capacity','direction'=>request('direction')==='asc'?'desc':'asc']) }}" class="sort-link">
+                                    Capacity <i class="fas fa-sort{{ request('sort')==='capacity'?(request('direction')==='asc'?'-up':'-down'):'' }}"></i>
+                                </a>
+                            </th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -108,21 +161,45 @@
                         @foreach($classes as $class)
                         <tr>
                             <td class="text-muted" style="font-size:.75rem;">#{{ $class->id }}</td>
-                            <td><div class="fw-600">{{ $class->name }}</div></td>
-                            <td>{{ $class->room_number ?? '—' }}</td>
-                            <td>{{ $class->teacher->name ?? '—' }}</td>
-                            <td>{{ $class->capacity }}</td>
                             <td>
-                                @php
-                                    $cls = $class->status === 'active' ? 'badge-active' : 'badge-inactive';
-                                @endphp
-                                <span class="badge {{ $cls }}">{{ ucfirst($class->status) }}</span>
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="class-avatar">{{ strtoupper(substr($class->name, 0, 2)) }}</div>
+                                    <div>
+                                        <div class="fw-bold" style="color:#1e293b;">{{ $class->name }}</div>
+                                        @if($class->room_number)
+                                        <div class="text-muted" style="font-size:.78rem;"><i class="fas fa-map-pin me-1"></i>Room {{ $class->room_number }}</div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ $class->room_number ?? '—' }}</td>
+                            <td>
+                                @if($class->teacher)
+                                <div class="fw-bold" style="font-size:.875rem;">{{ $class->teacher->name }}</div>
+                                <div class="text-muted" style="font-size:.75rem;">{{ $class->teacher->subject ?? '' }}</div>
+                                @else
+                                <span class="text-muted">—</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span class="d-flex align-items-center gap-1">
+                                    <i class="fas fa-users text-muted" style="font-size:.8rem;"></i>
+                                    <strong>{{ $class->capacity }}</strong>
+                                </span>
+                            </td>
+                            <td>
+                                @php $cls = $class->status === 'active' ? 'badge-active' : 'badge-inactive'; @endphp
+                                <span class="badge {{ $cls }}">
+                                    <i class="fas fa-circle me-1" style="font-size:.45rem;vertical-align:middle;"></i>
+                                    {{ ucfirst($class->status) }}
+                                </span>
                             </td>
                             <td>
                                 <div class="d-flex gap-1">
                                     <a href="{{ route('classes.edit', $class) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    @if(Auth::user()->isAdmin())
                                     <form method="POST" action="{{ route('classes.destroy', $class) }}"
                                           onsubmit="confirmDelete(event, this, 'Delete class {{ addslashes($class->name) }}?')">
                                         @csrf
@@ -131,6 +208,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -145,45 +223,20 @@
                 <small class="text-muted">
                     Showing {{ $classes->firstItem() }}–{{ $classes->lastItem() }} of {{ $classes->total() }} classes
                 </small>
-                {{ $classes->links() }}
+                {{ $classes->appends(request()->query())->links('pagination::bootstrap-5') }}
             </div>
             @endif
 
             @else
             <div class="text-center py-5 text-muted">
-                <i class="fas fa-door-open fa-3x mb-3 opacity-25"></i>
-                <p class="fw-600 mb-1">No classes found</p>
-                <small>Try adjusting your filters or <a href="{{ route('classes.create') }}">add a class</a>.</small>
+                <div style="width:72px;height:72px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <i class="fas fa-door-open" style="font-size:1.8rem;color:#cbd5e1;"></i>
+                </div>
+                <p class="fw-bold mb-1" style="color:#475569;">No classes found</p>
+                <small>Try adjusting your filters or <a href="{{ route('classes.create') }}" class="text-primary">add a class</a>.</small>
             </div>
             @endif
         </div>
     </div>
 </div>
-@endsection
-
-@section('styles')
-<style>
-.stat-mini {
-    background: white;
-    border-radius: 16px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    box-shadow: 0 2px 12px rgba(0,0,0,.06);
-}
-.stat-mini-icon {
-    width: 44px; height: 44px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-    color: white;
-    font-size: 1.1rem;
-    flex-shrink: 0;
-}
-.stat-mini-val  { font-size: 1.4rem; font-weight: 800; color: #1e293b; line-height: 1; }
-.stat-mini-label { font-size: .72rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
-.fw-600 { font-weight: 600; }
-.sort-link { color: inherit; text-decoration: none; }
-.sort-link:hover { color: var(--primary); }
-</style>
 @endsection

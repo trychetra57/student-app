@@ -8,6 +8,8 @@ class WebBackupController extends Controller
 {
     public function index()
     {
+        if (!auth()->user()->isSuperAdmin()) abort(403, 'Unauthorized access');
+
         $backupPath = database_path();
         $backups    = [];
 
@@ -17,21 +19,23 @@ class WebBackupController extends Controller
             if ($files) {
                 foreach ($files as $file) {
                     $backups[] = [
-                        'name'    => basename($file),
-                        'size'    => number_format(filesize($file) / 1024, 2) . ' KB',
-                        'created' => date('Y-m-d H:i:s', filemtime($file)),
-                        'path'    => $file,
+                        'filename'   => basename($file),
+                        'size'       => filesize($file),
+                        'created_at' => filemtime($file),
+                        'path'       => $file,
                     ];
                 }
                 $backups = array_reverse($backups);
             }
         }
 
-        return view('backup.index', compact('backups'));
+        return view('backup.index', ['backups' => collect($backups)]);
     }
 
     public function create()
     {
+        if (!auth()->user()->isSuperAdmin()) abort(403, 'Unauthorized access');
+
         $source    = database_path('database.sqlite');
         $backupDir = database_path('backups');
 
@@ -48,5 +52,28 @@ class WebBackupController extends Controller
         }
 
         return redirect()->route('backup.index')->with('error', 'Database file not found.');
+    }
+
+    public function download($filename)
+    {
+        if (!auth()->user()->isSuperAdmin()) abort(403, 'Unauthorized access');
+
+        $file = database_path('backups' . DIRECTORY_SEPARATOR . $filename);
+        if (file_exists($file)) {
+            return response()->download($file);
+        }
+        return redirect()->route('backup.index')->with('error', 'Backup file not found.');
+    }
+
+    public function destroy($filename)
+    {
+        if (!auth()->user()->isSuperAdmin()) abort(403, 'Unauthorized access');
+
+        $file = database_path('backups' . DIRECTORY_SEPARATOR . $filename);
+        if (file_exists($file)) {
+            unlink($file);
+            return redirect()->route('backup.index')->with('success', 'Backup deleted successfully.');
+        }
+        return redirect()->route('backup.index')->with('error', 'Backup file not found.');
     }
 }

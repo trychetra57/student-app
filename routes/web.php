@@ -17,6 +17,19 @@ Route::middleware('guest')->group(function () {
     Route::post('/login',    [WebAuthController::class, 'login'])->name('login.post');
     Route::get('/register',  [WebAuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [WebAuthController::class, 'register'])->name('register.post');
+    
+    if (app()->environment('local')) {
+        Route::post('/quick-login', function(Illuminate\Http\Request $request) {
+            $role = $request->input('role');
+            $user = \App\Models\User::where('role', $role)->first();
+            if ($user) {
+                auth()->login($user);
+                $request->session()->regenerate();
+                return redirect()->route('dashboard')->with('success', "Logged in quickly as {$role}.");
+            }
+            return back()->with('error', "No user found with role: {$role}. Please register one first.");
+        })->name('quick-login');
+    }
 });
 
 // ─── Authenticated Routes ─────────────────────────────────────────────────────
@@ -32,6 +45,8 @@ Route::middleware('auth')->group(function () {
     // Backup
     Route::get('/backup',  [WebBackupController::class, 'index'])->name('backup.index');
     Route::post('/backup', [WebBackupController::class, 'create'])->name('backup.create');
+    Route::get('/backup/{filename}/download', [WebBackupController::class, 'download'])->name('backup.download');
+    Route::delete('/backup/{filename}', [WebBackupController::class, 'destroy'])->name('backup.destroy');
 
     // API Docs
     Route::get('/api-docs', fn() => view('api.docs'))->name('api.docs');

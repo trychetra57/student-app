@@ -28,7 +28,7 @@
             overflow: hidden;
         }
         .login-header {
-            background: linear-gradient(135deg, #0f40e2ff 0%, #0b0be9ff 100%);
+            background: linear-gradient(135deg, #1a56e8 0%, #0d3ecc 100%);
             color: white;
             padding: 40px 20px;
             text-align: center;
@@ -64,18 +64,19 @@
             box-shadow: 0 0 0 0.2rem rgba(61, 139, 253, 0.25);
         }
         .btn-login {
-            background: linear-gradient(135deg, #f6f7f8 0%, #f9fafb 100%);
+            background: linear-gradient(135deg, #e01a1a 0%, #cc0d0d 100%);
             border: none;
             border-radius: 8px;
             padding: 12px 20px;
             font-weight: 600;
             width: 100%;
             margin-top: 10px;
+            color: white;
         }
         .btn-login:hover {
-            background: linear-gradient(135deg, #fbfbfc 0%, #f6f6f7 100%);
+            background: linear-gradient(135deg, #c91010 0%, #b00000 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(61, 139, 253, 0.4);
+            box-shadow: 0 5px 20px rgba(220, 38, 38, 0.4);
         }
         .remember-me {
             display: flex;
@@ -142,6 +143,14 @@
                     </div>
                 @endif
 
+                @if (session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-times-circle"></i>
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 @if ($errors->any())
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <i class="fas fa-exclamation-circle"></i>
@@ -170,9 +179,15 @@
 
                     <div class="form-group">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control @error('password') is-invalid @enderror" 
-                               id="password" name="password" 
-                               placeholder="••••••••" required>
+                        <div class="input-group">
+                            <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                                   id="password" name="password" required>
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword"
+                                    style="border-color: #d7dce1; background: #f8f9fa;"
+                                    onclick="togglePasswordVisibility()" title="Show/Hide password">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
                         @error('password')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
@@ -193,6 +208,30 @@
                 <div class="register-link">
                     <p>Don't have an account? <a href="{{ route('register') }}">Register here</a></p>
                 </div>
+                
+                @if(app()->environment('local'))
+                <div class="mt-4 pt-3 border-top">
+                    <div class="d-flex align-items-center justify-content-between p-3 rounded bg-light border" style="background-color: #f8f9fa;">
+                        <div class="text-secondary small fw-semibold">
+                            <i class="fas fa-laptop-code me-1"></i> Dev Access
+                        </div>
+                        <form action="{{ route('quick-login') }}" method="POST" class="d-flex align-items-center m-0 gap-2">
+                            @csrf
+                            <select name="role" class="form-select form-select-sm shadow-none" style="width: 140px; font-size: 0.85rem; border-color: #dee2e6;">
+                                <option value="super_admin">Super Admin</option>
+                                <option value="admin">Admin</option>
+                                <option value="staff">Staff</option>
+                                <option value="teacher">Teacher</option>
+                                <option value="student">Student</option>
+                            </select>
+                            <button type="submit" class="btn btn-sm btn-dark px-3 fw-medium" style="font-size: 0.85rem;">
+                                Login
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                @endif
+
             </div>
         </div>
 
@@ -202,5 +241,20 @@
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>

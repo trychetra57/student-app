@@ -38,10 +38,18 @@ class UserController extends Controller
         $data = $request->validate([
             'name'      => 'required|string|max:255',
             'email'     => 'required|email|unique:users,email,'.$user->id,
-            'role'      => 'required|in:admin,teacher,staff,student',
+            'role'      => 'required|in:super_admin,admin,teacher,staff,student',
             'is_active' => 'boolean',
             'password'  => 'nullable|string|min:6|confirmed',
         ]);
+
+        if ($data['role'] === 'super_admin' && !auth()->user()->isSuperAdmin()) {
+            return redirect()->back()->with('error', 'Only a Super Admin can assign the Super Admin role.')->withInput();
+        }
+
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->back()->with('error', 'Only a Super Admin can edit another Super Admin.')->withInput();
+        }
 
         if (!empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
@@ -59,6 +67,9 @@ class UserController extends Controller
         if (!auth()->user()->isAdmin()) abort(403);
         if ($user->id === auth()->id()) {
             return redirect()->back()->with('error', 'You cannot delete your own account.');
+        }
+        if ($user->isSuperAdmin() && !auth()->user()->isSuperAdmin()) {
+            return redirect()->back()->with('error', 'Only a Super Admin can delete another Super Admin.');
         }
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted.');

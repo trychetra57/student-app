@@ -10,6 +10,8 @@ class WebAuditController extends Controller
 {
     public function index(Request $request)
     {
+        if (!auth()->user()->isSuperAdmin()) abort(403, 'Unauthorized access');
+
         $query = AuditLog::with('user')->latest();
 
         if ($request->filled('user')) {

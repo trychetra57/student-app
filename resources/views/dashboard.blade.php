@@ -16,7 +16,7 @@
 
     /* ── Hero Banner ── */
     .dash-hero {
-        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
+        background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #6366f1 100%);
         color: white;
         padding: 36px 36px 80px;
         position: relative;
@@ -133,10 +133,10 @@
     }
 
     /* Card accent colors */
-    .sc-blue  .icon-wrap { background: linear-gradient(135deg,#2563eb,#60a5fa); }
-    .sc-blue  .stat-num  { color: #1e40af; }
-    .sc-blue  .stat-trend { background:#dbeafe; color:#1d4ed8; }
-    .sc-blue::after       { background:#2563eb; }
+    .sc-blue  .icon-wrap { background: linear-gradient(135deg,#4f46e5,#818cf8); }
+    .sc-blue  .stat-num  { color: #a16207; }
+    .sc-blue  .stat-trend { background:#fef08a; color:#4338ca; }
+    .sc-blue::after       { background:#4f46e5; }
 
     .sc-green .icon-wrap { background: linear-gradient(135deg,#16a34a,#4ade80); }
     .sc-green .stat-num  { color: #15803d; }
@@ -178,7 +178,7 @@
         align-items: center;
         gap: 8px;
     }
-    .section-title i { color: #2563eb; }
+    .section-title i { color: #4f46e5; }
 
     /* ── Chart Cards ── */
     .chart-card {
@@ -207,8 +207,8 @@
         font-weight: 600;
         padding: 4px 10px;
         border-radius: 20px;
-        background: #eff6ff;
-        color: #2563eb;
+        background: #e0e7ff;
+        color: #4f46e5;
     }
 
     /* ── Quick Actions ── */
@@ -233,7 +233,7 @@
         font-size: 0.88rem;
     }
     .action-btn:last-child { margin-bottom: 0; }
-    .action-btn:hover { border-color: #2563eb; color: #2563eb; background: #eff6ff; transform: translateX(4px); }
+    .action-btn:hover { border-color: #4f46e5; color: #4f46e5; background: #e0e7ff; transform: translateX(4px); }
     .action-btn .ab-icon {
         width: 36px; height: 36px;
         border-radius: 10px;
@@ -491,7 +491,7 @@
                                 <span class="section-title"><i class="fas fa-bolt"></i> Quick Actions</span>
                             </div>
                             <a href="{{ route('students.create') }}" class="action-btn">
-                                <div class="ab-icon" style="background:#eff6ff;color:#2563eb"><i class="fas fa-user-plus"></i></div>
+                                <div class="ab-icon" style="background:#e0e7ff;color:#4f46e5"><i class="fas fa-user-plus"></i></div>
                                 Add New Student
                             </a>
                             <a href="{{ route('students.index') }}" class="action-btn">
@@ -526,7 +526,7 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Role</span>
-                                    <span class="badge rounded-pill" style="background:#eff6ff;color:#2563eb;font-size:0.78rem">
+                                    <span class="badge rounded-pill" style="background:#e0e7ff;color:#4f46e5;font-size:0.78rem">
                                         {{ ucfirst(Auth::user()->role ?? 'staff') }}
                                     </span>
                                 </div>
@@ -607,7 +607,7 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
             labels: @json($gradeStats->pluck('grade')),
             datasets: [{ data: @json($gradeStats->pluck('count')),
-                backgroundColor: ['#2563eb','#16a34a','#7c3aed','#ea580c','#0891b2','#e11d48','#ca8a04','#64748b'],
+                backgroundColor: ['#4f46e5','#16a34a','#7c3aed','#ea580c','#0891b2','#e11d48','#4338ca','#64748b'],
                 borderWidth: 3, borderColor: '#ffffff', hoverOffset: 8 }]
         },
         options: {
@@ -628,10 +628,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     label: 'New Students',
                     data: @json(collect($monthlyData)->pluck('count')),
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37,99,235,0.08)',
+                    borderColor: '#4f46e5',
+                    backgroundColor: 'rgba(79,70,229,0.08)',
                     borderWidth: 2.5,
-                    pointBackgroundColor: '#2563eb',
+                    pointBackgroundColor: '#4f46e5',
                     pointRadius: 5,
                     pointHoverRadius: 7,
                     fill: true,

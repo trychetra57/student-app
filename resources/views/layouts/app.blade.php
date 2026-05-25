@@ -12,12 +12,12 @@
         :root {
             --sidebar-width: 260px;
             --topbar-height: 64px;
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #eff6ff;
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --primary-light: #e0e7ff;
             --sidebar-bg: #0f172a;
             --sidebar-text: rgba(255,255,255,0.7);
-            --sidebar-active: #2563eb;
+            --sidebar-active: #4f46e5;
             --danger: #e11d48;
             --success: #16a34a;
             --warning: #d97706;
@@ -59,7 +59,7 @@
         }
         .sidebar-brand .brand-icon {
             width: 40px; height: 40px;
-            background: linear-gradient(135deg, var(--primary), #60a5fa);
+            background: linear-gradient(135deg, var(--primary), #818cf8);
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.1rem;
@@ -108,9 +108,9 @@
             color: white;
         }
         .sidebar-link.active {
-            background: rgba(37,99,235,0.2);
-            color: #60a5fa;
-            border-left: 3px solid #60a5fa;
+            background: rgba(79,70,229,0.2);
+            color: #818cf8;
+            border-left: 3px solid #818cf8;
         }
         .sidebar-link .sl-icon {
             width: 32px; height: 32px;
@@ -120,7 +120,7 @@
             flex-shrink: 0;
             background: rgba(255,255,255,0.06);
         }
-        .sidebar-link.active .sl-icon { background: rgba(37,99,235,0.3); }
+        .sidebar-link.active .sl-icon { background: rgba(79,70,229,0.3); }
         .sidebar-footer {
             padding: 16px 20px;
             border-top: 1px solid rgba(255,255,255,0.08);
@@ -133,7 +133,7 @@
         .sidebar-user .su-avatar {
             width: 36px; height: 36px;
             border-radius: 10px;
-            background: linear-gradient(135deg,#2563eb,#60a5fa);
+            background: linear-gradient(135deg,#4f46e5,#818cf8);
             display: flex; align-items: center; justify-content: center;
             font-weight: 700;
             color: white;
@@ -230,7 +230,7 @@
         .topbar-user .tu-avatar {
             width: 30px; height: 30px;
             border-radius: 8px;
-            background: linear-gradient(135deg,#2563eb,#60a5fa);
+            background: linear-gradient(135deg,#4f46e5,#818cf8);
             display: flex; align-items: center; justify-content: center;
             font-weight: 700;
             color: white;
@@ -298,18 +298,17 @@
             gap: 7px;
         }
         .btn-primary { background: var(--primary); border-color: var(--primary); }
-        .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(37,99,235,0.35); }
+        .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(79,70,229,0.35); }
         .btn-secondary { background: #f1f5f9; border-color: #e2e8f0; color: #475569; }
         .btn-secondary:hover { background: #e2e8f0; color: #1e293b; }
         .btn-danger { background: var(--danger); border-color: var(--danger); }
         .btn-danger:hover { background: #be123c; border-color: #be123c; transform: translateY(-1px); }
         .btn-outline-primary { color: var(--primary); border-color: var(--primary); }
-        .btn-outline-primary:hover { background: var(--primary); }
-        .btn-success { background: var(--success); border-color: var(--success); }
+        .btn-outline-primary:hover { background: var(--primary); color: white; }
+        .btn-success { background: var(--success); border-color: var(--success); color: white; }
+        .btn-success:hover { background: #15803d; border-color: #15803d; color: white; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(22,163,74,0.35); }
         .btn-outline-danger { color: var(--danger); border-color: var(--danger); }
-        .btn-outline-danger:hover { background: var(--danger); }
-        .btn-outline-warning { color: var(--warning); border-color: var(--warning); }
-        .btn-outline-warning:hover { background: var(--warning); color: white; }
+        .btn-outline-danger:hover { background: var(--danger); color: white; }
 
         /* ── Forms ── */
         .form-control, .form-select {
@@ -321,7 +320,7 @@
         }
         .form-control:focus, .form-select:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+            box-shadow: 0 0 0 3px rgba(79,70,229,0.12);
         }
         .form-label {
             font-weight: 600;
@@ -379,6 +378,14 @@
             .topbar { left: 0; }
             .main-wrap { margin-left: 0; }
         }
+
+        /* ── Desktop Sidebar Collapsed ── */
+        @media (min-width: 992px) {
+            body.sidebar-collapsed .sidebar { transform: translateX(-100%); }
+            body.sidebar-collapsed .topbar  { left: 0; }
+            body.sidebar-collapsed .main-wrap { margin-left: 0; }
+        }
+
         @media (max-width: 576px) {
             .main-content { padding: 16px; }
             .page-title { font-size: 1.2rem; }
@@ -424,12 +431,14 @@
             </a>
 
             <div class="nav-section">System</div>
+            @if(Auth::user()->isSuperAdmin())
             <a href="{{ route('audit.index') }}" class="sidebar-link {{ request()->routeIs('audit.*') ? 'active' : '' }}">
                 <span class="sl-icon"><i class="fas fa-history"></i></span> Audit Logs
             </a>
             <a href="{{ route('backup.index') }}" class="sidebar-link {{ request()->routeIs('backup.*') ? 'active' : '' }}">
                 <span class="sl-icon"><i class="fas fa-database"></i></span> Backups
             </a>
+            @endif
             @if(Auth::user()->isAdmin())
             <a href="{{ route('users.index') }}" class="sidebar-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
                 <span class="sl-icon"><i class="fas fa-user-shield"></i></span> User Management
@@ -445,7 +454,7 @@
                 <div class="su-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
                 <div>
                     <div class="su-name">{{ Auth::user()->name }}</div>
-                    <div class="su-role">{{ ucfirst(Auth::user()->role ?? 'staff') }}</div>
+                    <div class="su-role">{{ ucwords(str_replace('_', ' ', Auth::user()->role ?? 'staff')) }}</div>
                 </div>
             </div>
         </div>
@@ -471,7 +480,10 @@
             <div class="dropdown">
                 <a class="topbar-user dropdown-toggle" href="#" data-bs-toggle="dropdown" style="text-decoration:none;">
                     <div class="tu-avatar">{{ strtoupper(substr(Auth::user()->name, 0, 2)) }}</div>
-                    <span class="tu-name d-none d-md-inline">{{ Auth::user()->name }}</span>
+                    <span class="tu-name d-none d-md-inline">
+                        {{ Auth::user()->name }} 
+                        <span class="text-muted" style="font-size: 0.75rem;">({{ ucwords(str_replace('_', ' ', Auth::user()->role ?? 'staff')) }})</span>
+                    </span>
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 rounded-3 mt-1">
                     <li><h6 class="dropdown-header">{{ Auth::user()->email }}</h6></li>
@@ -536,9 +548,15 @@
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const toggle  = document.getElementById('sidebarToggle');
+        const isMobile = () => window.innerWidth < 992;
+
         toggle.addEventListener('click', () => {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('open');
+            if (isMobile()) {
+                sidebar.classList.toggle('open');
+                overlay.classList.toggle('open');
+            } else {
+                document.body.classList.toggle('sidebar-collapsed');
+            }
         });
         overlay.addEventListener('click', () => {
             sidebar.classList.remove('open');

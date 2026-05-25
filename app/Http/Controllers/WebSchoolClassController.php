@@ -91,6 +91,7 @@ class WebSchoolClassController extends Controller
 
     public function destroy(SchoolClass $class)
     {
+        if (!auth()->user()->isAdmin()) abort(403, 'Unauthorized access');
         $class->delete();
         return redirect()->route('classes.index')
             ->with('success', "Class '{$class->name}' deleted.");

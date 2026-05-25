@@ -137,6 +137,7 @@ class WebTeacherController extends Controller
 
     public function destroy(Teacher $teacher)
     {
+        if (!auth()->user()->isAdmin()) abort(403, 'Unauthorized access');
         $teacher->delete();
         return redirect()->route('teachers.index')
             ->with('success', "Teacher '{$teacher->name}' deleted.");

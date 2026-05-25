@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class WebAuthController extends Controller
 {
@@ -27,18 +27,19 @@ class WebAuthController extends Controller
 
         $remember = $request->boolean('remember');
 
-        // Check if user is active
-        $user = User::where('email', $credentials['email'])->first();
-
-        if (!$user || !$user->is_active) {
-            return back()->withErrors([
-                'email' => 'Invalid email or password, or account is inactive.',
-            ])->withInput($request->only('email', 'remember'));
-        }
-
+        // Attempt authentication first (validates both email + password together)
+        // This prevents email enumeration — we don't reveal whether the email exists
         if (!Auth::attempt($credentials, $remember)) {
             return back()->withErrors([
                 'email' => 'Invalid email or password.',
+            ])->withInput($request->only('email', 'remember'));
+        }
+
+        // After a successful credential check, enforce the is_active flag
+        if (!Auth::user()->is_active) {
+            Auth::logout();
+            return back()->withErrors([
+                'email' => 'Your account has been deactivated. Please contact an administrator.',
             ])->withInput($request->only('email', 'remember'));
         }
 
@@ -58,7 +59,7 @@ class WebAuthController extends Controller
             'name'                  => 'required|string|max:255',
             'email'                 => 'required|email|unique:users,email',
             'password'              => 'required|string|min:8|confirmed',
-            'role'                  => 'nullable|in:staff,teacher',
+            'role'                  => 'nullable|in:super_admin,admin,staff,teacher',
         ]);
 
         $user = User::create([

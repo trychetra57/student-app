@@ -4,13 +4,13 @@
 <style>
 .filter-card{background:white;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);padding:20px 24px;margin-bottom:24px;}
 .tbl-card{background:white;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:hidden;}
-.student-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#60a5fa);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:.78rem;flex-shrink:0;}
+.student-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#4f46e5,#818cf8);display:flex;align-items:center;justify-content:center;font-weight:700;color:white;font-size:.78rem;flex-shrink:0;}
 .sort-link{text-decoration:none;color:inherit;display:inline-flex;align-items:center;gap:4px;font-weight:700;font-size:.75rem;}
-.sort-link:hover{color:#2563eb;}
-.bulk-bar{background:#1e3a8a;border-radius:12px;padding:12px 20px;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;display:none;}
+.sort-link:hover{color:#4f46e5;}
+.bulk-bar{background:#312e81;border-radius:12px;padding:12px 20px;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;display:none;}
 .bulk-bar.visible{display:flex;}
 .stat-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:600;}
-.pill-total{background:#eff6ff;color:#1d4ed8;}
+.pill-total{background:#e0e7ff;color:#4338ca;}
 .pill-active{background:#dcfce7;color:#15803d;}
 .pill-inactive{background:#ffe4e6;color:#be123c;}
 .pill-grad{background:#ede9fe;color:#5b21b6;}
@@ -22,10 +22,12 @@
     <div class="d-flex gap-2 flex-wrap">
         <a href="{{ route('students.create') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Add Student</a>
         <a href="{{ route('students.export', request()->query()) }}" class="btn btn-secondary"><i class="fas fa-download"></i> Export CSV</a>
+        @if(Auth::user()->isSuperAdmin())
         <form method="POST" action="{{ route('students.delete-all') }}" onsubmit="confirmDelete(event,this,'Delete ALL students?');">
             @csrf @method('DELETE')
             <button class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete All</button>
         </form>
+        @endif
     </div>
 </div>
 
@@ -91,15 +93,19 @@
 <div class="bulk-bar" id="bulkBar">
     <form id="bulk-form" method="POST" action="" style="display:none;">@csrf</form>
     <span style="color:#93c5fd;font-weight:600;font-size:.85rem;" id="bulkCount">0 selected</span>
-    <select id="bulk-action" class="form-select form-select-sm" style="width:auto;background:#1e3a8a;color:#93c5fd;border-color:#3b82f6;">
+    <select id="bulk-action" class="form-select form-select-sm" style="width:auto;background:#312e81;color:#93c5fd;border-color:#6366f1;">
         <option value="">Bulk Actions</option>
         <option value="status-active">Set Active</option>
         <option value="status-inactive">Set Inactive</option>
         <option value="status-graduated">Set Graduated</option>
+        @if(Auth::user()->isAdmin())
         <option value="delete">Soft Delete</option>
+        @endif
+        @if(Auth::user()->isSuperAdmin())
         <option value="force-delete">Permanent Delete</option>
+        @endif
     </select>
-    <button id="apply-bulk" class="btn btn-sm" style="background:#2563eb;color:white;"><i class="fas fa-check"></i> Apply</button>
+    <button id="apply-bulk" class="btn btn-sm" style="background:#4f46e5;color:white;"><i class="fas fa-check"></i> Apply</button>
     <button type="button" onclick="clearSel()" class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#93c5fd;"><i class="fas fa-times"></i> Cancel</button>
 </div>
 
@@ -161,7 +167,7 @@
                 <td>
                     <div class="d-flex gap-1">
                         <a href="{{ route('students.show',$student) }}" class="btn btn-sm btn-outline-primary" title="View"><i class="fas fa-eye"></i></a>
-                        <a href="{{ route('students.edit',$student) }}" class="btn btn-sm btn-outline-warning" title="Edit"><i class="fas fa-edit"></i></a>
+                        <a href="{{ route('students.edit',$student) }}" class="btn btn-sm btn-outline-primary" title="Edit"><i class="fas fa-edit"></i></a>
                         <form method="POST" action="{{ route('students.destroy',$student) }}" class="d-inline" onsubmit="confirmDelete(event,this,'Delete {{ addslashes($student->name) }}?');">
                             @csrf @method('DELETE')
                             <button class="btn btn-sm btn-outline-danger" title="Delete"><i class="fas fa-trash"></i></button>
@@ -183,7 +189,7 @@
     </div>
     @if($students->hasPages())
     <div class="px-4 py-3 border-top d-flex justify-content-center">
-        {{ $students->appends(request()->query())->links() }}
+        {{ $students->appends(request()->query())->links('pagination::bootstrap-5') }}
     </div>
     @endif
 </div>
