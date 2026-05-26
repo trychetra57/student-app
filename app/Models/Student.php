@@ -35,7 +35,7 @@ class Student extends Model
 
     protected $appends = ['profile_picture_url'];
 
-    // Relationships
+    // Relationship for student documents
     public function documents(): HasMany
     {
         return $this->hasMany(StudentDocument::class);

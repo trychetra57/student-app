@@ -2,35 +2,47 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../lib/axios';
 
-const StatCard = ({ title, value, subtitle, color, icon, change }) => (
-    <div style={{
-        background: 'white', borderRadius: '16px', padding: '22px 24px',
-        boxShadow: '0 1px 4px rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', gap: '18px',
-        border: '1px solid #f1f3f9', transition: 'box-shadow 0.2s',
-    }}
-        onMouseEnter={e => e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.1)'}
-        onMouseLeave={e => e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.07)'}
-    >
+const StatCard = ({ title, value, subtitle, color, icon, href }) => {
+    const inner = (
         <div style={{
-            width: '52px', height: '52px', borderRadius: '14px', flexShrink: 0,
-            background: `linear-gradient(135deg, ${color}22, ${color}44)`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px',
-        }}>{icon}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{title}</p>
-            <p style={{ margin: '4px 0 0', fontSize: '28px', fontWeight: '800', color: '#111827', lineHeight: 1 }}>{value}</p>
-            {subtitle && <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#9ca3af' }}>{subtitle}</p>}
+            background: 'white', borderRadius: '16px', padding: '22px 24px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.07)', display: 'flex', alignItems: 'center', gap: '18px',
+            border: '1px solid #f1f3f9', transition: 'box-shadow 0.2s, transform 0.2s',
+            cursor: href ? 'pointer' : 'default',
+        }}
+            onMouseEnter={e => {
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.12)';
+                if (href) e.currentTarget.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={e => {
+                e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.07)';
+                e.currentTarget.style.transform = 'translateY(0)';
+            }}
+        >
+            <div style={{
+                width: '52px', height: '52px', borderRadius: '14px', flexShrink: 0,
+                background: `linear-gradient(135deg, ${color}22, ${color}44)`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px',
+            }}>{icon}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ margin: 0, fontSize: '12px', fontWeight: '600', color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{title}</p>
+                <p style={{ margin: '4px 0 0', fontSize: '28px', fontWeight: '800', color: '#111827', lineHeight: 1 }}>{value}</p>
+                {subtitle && <p style={{ margin: '3px 0 0', fontSize: '11px', color: '#9ca3af' }}>{subtitle}</p>}
+            </div>
+            <div style={{
+                width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
+                background: color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+                <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" style={{ width: '14px' }}>
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </div>
         </div>
-        <div style={{
-            width: '36px', height: '36px', borderRadius: '50%', flexShrink: 0,
-            background: color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-            <svg viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" style={{ width: '14px' }}>
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-        </div>
-    </div>
-);
+    );
+    return href
+        ? <Link to={href} style={{ textDecoration: 'none', display: 'block' }}>{inner}</Link>
+        : inner;
+};
 
 export default function Dashboard() {
     const [data, setData] = useState(null);
@@ -64,11 +76,11 @@ export default function Dashboard() {
     const now = new Date();
 
     const statCards = [
-        { title: 'Total Students', value: s.total_students, color: '#6366f1', icon: '🎓', subtitle: 'All registered' },
-        { title: 'Active', value: s.active_students, color: '#10b981', icon: '📗', subtitle: 'Currently enrolled' },
-        { title: 'Inactive', value: s.inactive_students, color: '#f59e0b', icon: '📙', subtitle: 'On hold' },
-        { title: 'Graduated', value: s.graduated_students, color: '#3b82f6', icon: '🏆', subtitle: 'Completed' },
-        { title: 'New This Month', value: s.new_this_month, color: '#8b5cf6', icon: '✨', subtitle: now.toLocaleString('default', { month: 'long', year: 'numeric' }) },
+        { title: 'Total Students', value: s.total_students, color: '#6366f1', icon: '🎓', subtitle: 'All registered', href: '/students' },
+        { title: 'Active', value: s.active_students, color: '#10b981', icon: '📗', subtitle: 'Currently enrolled', href: '/students?status=active' },
+        { title: 'Inactive', value: s.inactive_students, color: '#f59e0b', icon: '📙', subtitle: 'On hold', href: '/students?status=inactive' },
+        { title: 'Graduated', value: s.graduated_students, color: '#3b82f6', icon: '🏆', subtitle: 'Completed', href: '/students?status=graduated' },
+        { title: 'New This Month', value: s.new_this_month, color: '#8b5cf6', icon: '✨', subtitle: now.toLocaleString('default', { month: 'long', year: 'numeric' }), href: '/students' },
     ];
 
     const activeRate = s.total_students > 0 ? Math.round((s.active_students / s.total_students) * 100) : 0;
@@ -137,11 +149,14 @@ export default function Dashboard() {
                 <div style={{ background: 'white', borderRadius: '16px', padding: '24px', boxShadow: '0 1px 4px rgba(0,0,0,0.07)', border: '1px solid #f1f3f9' }}>
                     <h3 style={{ margin: '0 0 20px', fontSize: '15px', fontWeight: '700', color: '#111827' }}>Status Breakdown</h3>
                     {[
-                        { label: 'Active', count: s.active_students, color: '#10b981', bg: '#d1fae5' },
-                        { label: 'Inactive', count: s.inactive_students, color: '#f59e0b', bg: '#fef3c7' },
-                        { label: 'Graduated', count: s.graduated_students, color: '#3b82f6', bg: '#dbeafe' },
-                    ].map(({ label, count, color, bg }) => (
-                        <div key={label} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f9fafb' }}>
+                        { label: 'Active', count: s.active_students, color: '#10b981', bg: '#d1fae5', status: 'active' },
+                        { label: 'Inactive', count: s.inactive_students, color: '#f59e0b', bg: '#fef3c7', status: 'inactive' },
+                        { label: 'Graduated', count: s.graduated_students, color: '#3b82f6', bg: '#dbeafe', status: 'graduated' },
+                    ].map(({ label, count, color, bg, status }) => (
+                        <Link key={label} to={`/students?status=${status}`} style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #f9fafb', cursor: 'pointer', transition: 'background 0.15s', borderRadius: '6px', margin: '0 -6px', padding: '10px 6px' }}
+                            onMouseEnter={e => e.currentTarget.style.background = '#f9fafb'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        >
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                 <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: color }} />
                                 <span style={{ fontSize: '13px', fontWeight: '500', color: '#374151' }}>{label}</span>
@@ -149,7 +164,7 @@ export default function Dashboard() {
                             <span style={{ background: bg, color, fontSize: '12px', fontWeight: '700', padding: '3px 10px', borderRadius: '999px' }}>
                                 {count}
                             </span>
-                        </div>
+                        </Link>
                     ))}
                 </div>
             </div>

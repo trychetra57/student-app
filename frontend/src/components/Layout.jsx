@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const navItems = [
@@ -27,6 +27,17 @@ export default function Layout({ children }) {
     const location = useLocation();
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setDropdownOpen(false);
+            }
+        };
+        if (dropdownOpen) document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [dropdownOpen]);
 
     const user = JSON.parse(localStorage.getItem('user') || '{"name":"Admin"}');
 
@@ -118,7 +129,7 @@ export default function Layout({ children }) {
                             {navItems.find(n => n.path === location.pathname)?.name || 'Page'}
                         </h2>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', position: 'relative' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', position: 'relative' }} ref={dropdownRef}>
                         <button onClick={() => setDropdownOpen(!dropdownOpen)} style={{
                             display: 'flex', alignItems: 'center', gap: '10px',
                             background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '10px',
@@ -141,12 +152,15 @@ export default function Layout({ children }) {
                                 border: '1px solid #e5e7eb', borderRadius: '12px', padding: '8px',
                                 boxShadow: '0 10px 30px rgba(0,0,0,0.1)', minWidth: '160px', zIndex: 100,
                             }}>
-                                <button onClick={handleLogout} style={{
-                                    width: '100%', textAlign: 'left', background: 'none', border: 'none',
-                                    padding: '10px 14px', borderRadius: '8px', cursor: 'pointer',
-                                    fontSize: '13px', fontWeight: '500', color: '#ef4444',
-                                    display: 'flex', alignItems: 'center', gap: '8px',
-                                }}>
+                                <button onClick={handleLogout}
+                                    onMouseEnter={e => e.currentTarget.style.background = '#fef2f2'}
+                                    onMouseLeave={e => e.currentTarget.style.background = 'none'}
+                                    style={{
+                                        width: '100%', textAlign: 'left', background: 'none', border: 'none',
+                                        padding: '10px 14px', borderRadius: '8px', cursor: 'pointer',
+                                        fontSize: '13px', fontWeight: '500', color: '#ef4444',
+                                        display: 'flex', alignItems: 'center', gap: '8px', transition: 'background 0.15s',
+                                    }}>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ width: '15px' }}>
                                         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
                                     </svg>

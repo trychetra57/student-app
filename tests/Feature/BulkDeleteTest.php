@@ -18,7 +18,7 @@ class BulkDeleteTest extends TestCase
         parent::setUp();
         // Create an admin user for authentication
         $this->admin = User::factory()->create([
-            'role' => 'admin',
+            'role' => 'super_admin',
             // Password will be auto‑hashed via model casts
             'password' => 'password',
         ]);

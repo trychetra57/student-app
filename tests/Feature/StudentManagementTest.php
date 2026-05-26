@@ -30,7 +30,7 @@ class StudentManagementTest extends TestCase
             'phone' => '555-1234',
         ]);
 
-        $response = $this->get('/');
+        $response = $this->get(route('students.index'));
 
         $response->assertStatus(200);
         $response->assertSee('Jane Doe');

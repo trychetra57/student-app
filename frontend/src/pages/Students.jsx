@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../lib/axios';
 
 const StatusPill = ({ status }) => {
@@ -19,11 +19,13 @@ const StatusPill = ({ status }) => {
 
 export default function Students() {
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [students, setStudents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('all');
+    const [status, setStatus] = useState(searchParams.get('status') || 'all');
     const [perPage, setPerPage] = useState(10);
+    const [page, setPage] = useState(1);
     const [selectedIds, setSelectedIds] = useState([]);
     const [bulkAction, setBulkAction] = useState('');
     const [pagination, setPagination] = useState(null);
@@ -32,13 +34,13 @@ export default function Students() {
 
     useEffect(() => {
         fetchStudents();
-    }, [status, perPage, sortBy, sortDir]);
+    }, [status, perPage, sortBy, sortDir, page]);
 
     const fetchStudents = async () => {
         setLoading(true);
         try {
             const response = await api.get('/students', {
-                params: { search, status, per_page: perPage, sort: sortBy, direction: sortDir }
+                params: { search, status, per_page: perPage, sort: sortBy, direction: sortDir, page }
             });
             setStudents(response.data.data.data || []);
             setPagination(response.data.data);
@@ -51,18 +53,23 @@ export default function Students() {
 
     const handleSearch = (e) => {
         e.preventDefault();
+        setPage(1);
         fetchStudents();
     };
 
     const clearFilters = () => {
-        setSearch(''); setStatus('all'); setPerPage(10); setSortBy('name'); setSortDir('asc');
+        setSearch(''); setStatus('all'); setPerPage(10); setSortBy('name'); setSortDir('asc'); setPage(1);
         setTimeout(fetchStudents, 0);
     };
 
     const handleSort = (col) => {
+        setPage(1);
         if (sortBy === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
         else { setSortBy(col); setSortDir('asc'); }
     };
+
+    const handleStatusChange = (val) => { setStatus(val); setPage(1); };
+    const handlePerPageChange = (val) => { setPerPage(+val); setPage(1); };
 
     const handleDelete = async (id) => {
         if (!confirm('Delete this student?')) return;
@@ -145,13 +152,13 @@ export default function Students() {
                             style={{ width: '100%', paddingLeft: '36px', paddingRight: '12px', paddingTop: '9px', paddingBottom: '9px', border: '1px solid #e5e7eb', borderRadius: '10px', fontSize: '13px', outline: 'none', background: '#f9fafb' }}
                         />
                     </div>
-                    <select value={status} onChange={e => setStatus(e.target.value)} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '9px 14px', fontSize: '13px', background: '#f9fafb', cursor: 'pointer', outline: 'none' }}>
+                    <select value={status} onChange={e => handleStatusChange(e.target.value)} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '9px 14px', fontSize: '13px', background: '#f9fafb', cursor: 'pointer', outline: 'none' }}>
                         <option value="all">All Status</option>
                         <option value="active">Active</option>
                         <option value="inactive">Inactive</option>
                         <option value="graduated">Graduated</option>
                     </select>
-                    <select value={perPage} onChange={e => setPerPage(+e.target.value)} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '9px 14px', fontSize: '13px', background: '#f9fafb', cursor: 'pointer', outline: 'none' }}>
+                    <select value={perPage} onChange={e => handlePerPageChange(e.target.value)} style={{ border: '1px solid #e5e7eb', borderRadius: '10px', padding: '9px 14px', fontSize: '13px', background: '#f9fafb', cursor: 'pointer', outline: 'none' }}>
                         <option value={10}>10 / page</option>
                         <option value={25}>25 / page</option>
                         <option value={50}>50 / page</option>
@@ -282,15 +289,31 @@ export default function Students() {
 
                 {/* Pagination */}
                 {pagination && pagination.last_page > 1 && (
-                    <div style={{ padding: '16px 20px', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'center', gap: '6px' }}>
-                        {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map(page => (
-                            <button key={page} style={{
+                    <div style={{ padding: '16px 20px', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                        {/* Prev button */}
+                        <button
+                            onClick={() => setPage(p => Math.max(1, p - 1))}
+                            disabled={pagination.current_page === 1}
+                            style={{
+                                width: '32px', height: '32px', borderRadius: '8px', border: 'none', cursor: pagination.current_page === 1 ? 'default' : 'pointer',
+                                background: '#f9fafb', color: pagination.current_page === 1 ? '#d1d5db' : '#374151', fontSize: '14px',
+                            }}>‹</button>
+                        {Array.from({ length: pagination.last_page }, (_, i) => i + 1).map(p => (
+                            <button key={p} onClick={() => setPage(p)} style={{
                                 width: '32px', height: '32px', borderRadius: '8px', border: 'none', cursor: 'pointer',
-                                background: page === pagination.current_page ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : '#f9fafb',
-                                color: page === pagination.current_page ? 'white' : '#374151',
-                                fontSize: '13px', fontWeight: page === pagination.current_page ? '700' : '400',
-                            }}>{page}</button>
+                                background: p === pagination.current_page ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : '#f9fafb',
+                                color: p === pagination.current_page ? 'white' : '#374151',
+                                fontSize: '13px', fontWeight: p === pagination.current_page ? '700' : '400',
+                            }}>{p}</button>
                         ))}
+                        {/* Next button */}
+                        <button
+                            onClick={() => setPage(p => Math.min(pagination.last_page, p + 1))}
+                            disabled={pagination.current_page === pagination.last_page}
+                            style={{
+                                width: '32px', height: '32px', borderRadius: '8px', border: 'none', cursor: pagination.current_page === pagination.last_page ? 'default' : 'pointer',
+                                background: '#f9fafb', color: pagination.current_page === pagination.last_page ? '#d1d5db' : '#374151', fontSize: '14px',
+                            }}>›</button>
                     </div>
                 )}
             </div>
