@@ -46,6 +46,21 @@ class Student extends Model
         return $this->hasMany(AuditLog::class, 'model_id')->where('model_type', self::class);
     }
 
+    public function classes()
+    {
+        return $this->belongsToMany(SchoolClass::class, 'class_student', 'student_id', 'school_class_id');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class);
+    }
+
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
+
     // Scopes
     public function scopeActive($query)
     {

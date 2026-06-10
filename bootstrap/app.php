@@ -18,7 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'teachers',
             'teachers/*',
             'classes',
-            'classes/*'
+            'classes/*',
+            'attendance',
+            'attendance/*',
+            'grades',
+            'grades/*'
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="BelTei University Admin — Student Management System">
+    <meta name="description" content="LEARN Academy Admin — Student Management System">
     <title>@yield('title', 'Student Management System')</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&family=Battambang:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --sidebar-width: 260px;
             --topbar-height: 64px;
-            --primary: #4f46e5;
-            --primary-dark: #4338ca;
-            --primary-light: #e0e7ff;
-            --sidebar-bg: #0f172a;
-            --sidebar-text: rgba(255,255,255,0.7);
-            --sidebar-active: #4f46e5;
-            --danger: #e11d48;
-            --success: #16a34a;
-            --warning: #d97706;
+            --primary: #125875;
+            --primary-dark: #0d3f54;
+            --primary-light: #e6f2f7;
+            --sidebar-bg: #111111;
+            --sidebar-text: rgba(255,255,255,0.75);
+            --sidebar-active: #ff7350;
+            --danger: #ff7350;
+            --success: #01aa59;
+            --warning: #ff7350;
             --surface: #ffffff;
             --bg: #f0f2f8;
             --border: #e2e8f0;
@@ -29,7 +29,7 @@
         }
         * { box-sizing: border-box; }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Open Sans', 'Battambang', sans-serif;
             background: var(--bg);
             color: var(--text);
             margin: 0;
@@ -56,10 +56,11 @@
             align-items: center;
             gap: 12px;
             text-decoration: none;
+            background: var(--primary);
         }
         .sidebar-brand .brand-icon {
             width: 40px; height: 40px;
-            background: linear-gradient(135deg, var(--primary), #818cf8);
+            background: linear-gradient(135deg, var(--primary), #01aa59);
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.1rem;
@@ -108,9 +109,9 @@
             color: white;
         }
         .sidebar-link.active {
-            background: rgba(79,70,229,0.2);
-            color: #818cf8;
-            border-left: 3px solid #818cf8;
+            background: rgba(255,115,80,0.15);
+            color: #ff7350;
+            border-left: 3px solid #ff7350;
         }
         .sidebar-link .sl-icon {
             width: 32px; height: 32px;
@@ -120,7 +121,44 @@
             flex-shrink: 0;
             background: rgba(255,255,255,0.06);
         }
-        .sidebar-link.active .sl-icon { background: rgba(79,70,229,0.3); }
+        .sidebar-link.active .sl-icon { background: rgba(255,115,80,0.25); }
+        .sidebar-submenu {
+            padding: 5px 0;
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 8px;
+            margin: 0 10px 8px;
+        }
+        .sidebar-sublink {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            color: rgba(255, 255, 255, 0.65);
+            text-decoration: none;
+            font-size: 0.825rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.2s;
+            margin: 2px 8px;
+        }
+        .sidebar-sublink:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.05);
+            padding-left: 20px;
+        }
+        .sidebar-sublink.active {
+            color: #ff7350;
+            background: rgba(255, 115, 80, 0.12);
+            font-weight: 600;
+        }
+        /* Chevron rotation */
+        .sidebar-link[aria-expanded="true"] .chevron-icon {
+            transform: rotate(90deg);
+        }
+        .chevron-icon {
+            transition: transform 0.2s ease;
+            font-size: 0.75rem;
+        }
         .sidebar-footer {
             padding: 16px 20px;
             border-top: 1px solid rgba(255,255,255,0.08);
@@ -402,9 +440,9 @@
     <!-- ── Sidebar ── -->
     <aside class="sidebar" id="sidebar">
         <a class="sidebar-brand" href="{{ route('dashboard') }}">
-            <div class="brand-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="brand-icon" style="background: linear-gradient(135deg, #125875, #01aa59);"><i class="fas fa-graduation-cap"></i></div>
             <div>
-                <div class="brand-text">BelTei University</div>
+                <div class="brand-text">LEARN Academy</div>
                 <div class="brand-sub">Admin Panel</div>
             </div>
         </a>
@@ -412,8 +450,36 @@
         <nav class="sidebar-nav">
             <div class="nav-section">Main</div>
             <a href="{{ route('dashboard') }}" class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <span class="sl-icon"><i class="fas fa-chart-pie"></i></span> Dashboard
+                <span class="sl-icon"><i class="fas fa-home"></i></span> Dashboard
             </a>
+
+            <a href="#frontWebCollapse" class="sidebar-link {{ request()->is('admin/sliders*', 'admin/about-us*', 'admin/courses*', 'admin/news*', 'admin/galleries*', 'admin/footer-pages*') ? 'active' : '' }}" data-bs-toggle="collapse" role="button" aria-expanded="{{ request()->is('admin/sliders*', 'admin/about-us*', 'admin/courses*', 'admin/news*', 'admin/galleries*', 'admin/footer-pages*') ? 'true' : 'false' }}" aria-controls="frontWebCollapse">
+                <span class="sl-icon"><i class="fas fa-globe"></i></span> Front Web
+                <i class="fas fa-chevron-right ms-auto chevron-icon"></i>
+            </a>
+            <div class="collapse {{ request()->is('admin/sliders*', 'admin/about-us*', 'admin/courses*', 'admin/news*', 'admin/galleries*', 'admin/footer-pages*') ? 'show' : '' }}" id="frontWebCollapse">
+                <div class="sidebar-submenu">
+                    <a href="{{ route('admin.sliders.index') }}" class="sidebar-sublink {{ request()->routeIs('admin.sliders.*') ? 'active' : '' }}">
+                        <i class="fas fa-image"></i> Sliders
+                    </a>
+                    <a href="{{ route('admin.about-us.index') }}" class="sidebar-sublink {{ request()->routeIs('admin.about-us.*') ? 'active' : '' }}">
+                        <i class="fas fa-info-circle"></i> About Us
+                    </a>
+                    <a href="{{ route('admin.courses.index') }}" class="sidebar-sublink {{ request()->routeIs('admin.courses.*') ? 'active' : '' }}">
+                        <i class="fas fa-book-open"></i> Courses
+                    </a>
+                    <a href="{{ route('admin.news.index') }}" class="sidebar-sublink {{ request()->routeIs('admin.news.*') ? 'active' : '' }}">
+                        <i class="fas fa-newspaper"></i> News
+                    </a>
+                    <a href="{{ route('admin.galleries.index') }}" class="sidebar-sublink {{ request()->routeIs('admin.galleries.*') ? 'active' : '' }}">
+                        <i class="fas fa-images"></i> Gallery
+                    </a>
+                    <a href="{{ route('admin.footer-pages.index') }}" class="sidebar-sublink {{ request()->routeIs('admin.footer-pages.*') ? 'active' : '' }}">
+                        <i class="fas fa-file-alt"></i> Footer Pages
+                    </a>
+                </div>
+            </div>
+
             <a href="{{ route('students.index') }}" class="sidebar-link {{ request()->routeIs('students.*') && !request()->routeIs('students.create') ? 'active' : '' }}">
                 <span class="sl-icon"><i class="fas fa-users"></i></span> All Students
             </a>
@@ -425,6 +491,12 @@
             </a>
             <a href="{{ route('classes.index') }}" class="sidebar-link {{ request()->routeIs('classes.*') ? 'active' : '' }}">
                 <span class="sl-icon"><i class="fas fa-door-open"></i></span> Classes
+            </a>
+            <a href="{{ route('attendance.index') }}" class="sidebar-link {{ request()->routeIs('attendance.*') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-calendar-check"></i></span> Attendance
+            </a>
+            <a href="{{ route('grades.index') }}" class="sidebar-link {{ request()->routeIs('grades.*') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-file-signature"></i></span> Grades & Transcripts
             </a>
             <a href="{{ route('students.export') }}" class="sidebar-link">
                 <span class="sl-icon"><i class="fas fa-file-csv"></i></span> Export CSV
@@ -446,6 +518,11 @@
             @endif
             <a href="{{ route('api.docs') }}" class="sidebar-link {{ request()->routeIs('api.docs') ? 'active' : '' }}">
                 <span class="sl-icon"><i class="fas fa-code"></i></span> API Docs
+            </a>
+
+            <div class="nav-section">Account</div>
+            <a href="{{ route('users.profile') }}" class="sidebar-link {{ request()->routeIs('users.profile') ? 'active' : '' }}">
+                <span class="sl-icon"><i class="fas fa-user-circle"></i></span> My Profile
             </a>
         </nav>
 
@@ -537,7 +614,7 @@
         </main>
 
         <footer class="footer">
-            &copy; {{ date('Y') }} BelTei University Admin &mdash; Student Management System
+            &copy; {{ date('Y') }} LEARN Academy Admin &mdash; Student Management System
         </footer>
     </div>
 
@@ -571,8 +648,8 @@
                 text: message,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#e11d48',
-                cancelButtonColor: '#64748b',
+                confirmButtonColor: '#ff7350',
+                cancelButtonColor: '#125875',
                 confirmButtonText: 'Yes, delete it!',
                 borderRadius: '16px'
             }).then(result => { if (result.isConfirmed) form.submit(); });
@@ -584,8 +661,8 @@
                 text: message,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#e11d48',
-                cancelButtonColor: '#64748b',
+                confirmButtonColor: '#01aa59',
+                cancelButtonColor: '#ff7350',
                 confirmButtonText: 'Yes, proceed!'
             }).then(result => { if (result.isConfirmed) callback(); });
         }

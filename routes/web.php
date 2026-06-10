@@ -7,9 +7,20 @@ use App\Http\Controllers\WebBackupController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebTeacherController;
 use App\Http\Controllers\WebSchoolClassController;
+use App\Http\Controllers\PublicController;
+use App\Http\Controllers\FrontWebController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', fn() => redirect()->route('login'));
+// ─── Public Website Routes ────────────────────────────────────────────────────
+Route::get('/', [PublicController::class, 'home'])->name('home');
+Route::get('/programs', [PublicController::class, 'programs'])->name('programs');
+Route::get('/tuition', [PublicController::class, 'tuition'])->name('tuition');
+Route::get('/services', [PublicController::class, 'services'])->name('services');
+Route::get('/events', [PublicController::class, 'events'])->name('events');
+Route::get('/placement-test', [PublicController::class, 'placementTest'])->name('placement-test');
+Route::post('/placement-test/submit', [PublicController::class, 'submitPlacementTest'])->name('placement-test.submit');
+Route::get('/success-hub', [PublicController::class, 'successHub'])->name('success-hub');
+Route::post('/contact-submit', [PublicController::class, 'contactSubmit'])->name('contact.submit');
 
 // ─── Auth Routes ──────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -22,12 +33,18 @@ Route::middleware('guest')->group(function () {
         Route::post('/quick-login', function(Illuminate\Http\Request $request) {
             $role = $request->input('role');
             $user = \App\Models\User::where('role', $role)->first();
-            if ($user) {
-                auth()->login($user);
-                $request->session()->regenerate();
-                return redirect()->route('dashboard')->with('success', "Logged in quickly as {$role}.");
+            if (!$user) {
+                $user = \App\Models\User::create([
+                    'name' => ucwords(str_replace('_', ' ', $role)),
+                    'email' => $role . '@learn.edu.kh',
+                    'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                    'role' => $role,
+                    'is_active' => true
+                ]);
             }
-            return back()->with('error', "No user found with role: {$role}. Please register one first.");
+            auth()->login($user);
+            $request->session()->regenerate();
+            return redirect()->route('dashboard')->with('success', "Logged in quickly as {$role}.");
         })->name('quick-login');
     }
 });
@@ -38,6 +55,17 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [WebStudentController::class, 'dashboard'])->name('dashboard');
+
+    // Profile page
+    Route::get('/profile', [UserController::class, 'profile'])->name('users.profile');
+
+    // Front Web Management
+    Route::get('/admin/sliders', [FrontWebController::class, 'sliders'])->name('admin.sliders.index');
+    Route::get('/admin/about-us', [FrontWebController::class, 'aboutUs'])->name('admin.about-us.index');
+    Route::get('/admin/courses', [FrontWebController::class, 'courses'])->name('admin.courses.index');
+    Route::get('/admin/news', [FrontWebController::class, 'news'])->name('admin.news.index');
+    Route::get('/admin/galleries', [FrontWebController::class, 'galleries'])->name('admin.galleries.index');
+    Route::get('/admin/footer-pages', [FrontWebController::class, 'footerPages'])->name('admin.footer-pages.index');
 
     // Audit Logs
     Route::get('/audit', [WebAuditController::class, 'index'])->name('audit.index');
@@ -78,4 +106,19 @@ Route::middleware('auth')->group(function () {
 
     // Classes CRUD
     Route::resource('classes', WebSchoolClassController::class)->parameters(['classes' => 'class']);
+
+    // Class Enrollment
+    Route::get('/classes/{class}/enroll', [WebSchoolClassController::class, 'showEnrollment'])->name('classes.enroll.show');
+    Route::post('/classes/{class}/enroll', [WebSchoolClassController::class, 'enrollStudents'])->name('classes.enroll.store');
+
+    // Attendance Management
+    Route::get('/attendance', [\App\Http\Controllers\WebAttendanceController::class, 'index'])->name('attendance.index');
+    Route::get('/attendance/class/{class}', [\App\Http\Controllers\WebAttendanceController::class, 'showSheet'])->name('attendance.sheet');
+    Route::post('/attendance/class/{class}', [\App\Http\Controllers\WebAttendanceController::class, 'saveSheet'])->name('attendance.store');
+
+    // Grades & Transcripts
+    Route::get('/grades', [\App\Http\Controllers\WebGradeController::class, 'index'])->name('grades.index');
+    Route::get('/grades/class/{class}', [\App\Http\Controllers\WebGradeController::class, 'classGrades'])->name('grades.class');
+    Route::post('/grades/class/{class}', [\App\Http\Controllers\WebGradeController::class, 'saveGrades'])->name('grades.store');
+    Route::get('/students/{student}/transcript', [\App\Http\Controllers\WebGradeController::class, 'studentTranscript'])->name('students.transcript');
 });

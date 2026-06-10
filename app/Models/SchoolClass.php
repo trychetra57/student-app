@@ -22,4 +22,19 @@ class SchoolClass extends Model
     {
         return $this->belongsTo(Teacher::class);
     }
+
+    public function students()
+    {
+        return $this->belongsToMany(Student::class, 'class_student', 'school_class_id', 'student_id');
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(Attendance::class, 'school_class_id');
+    }
+
+    public function grades()
+    {
+        return $this->hasMany(Grade::class, 'school_class_id');
+    }
 }

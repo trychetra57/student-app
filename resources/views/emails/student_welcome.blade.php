@@ -5,7 +5,7 @@
     <style>
         body{font-family:'Segoe UI',sans-serif;background:#f0f2f8;margin:0;padding:40px 20px;}
         .card{max-width:560px;margin:0 auto;background:white;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.1);}
-        .header{background:linear-gradient(135deg,#1e3a8a,#2563eb);padding:40px 40px 32px;text-align:center;}
+        .header{background:linear-gradient(135deg,#125875,#ff7350);padding:40px 40px 32px;text-align:center;}
         .header i{font-size:2.5rem;color:rgba(255,255,255,.9);margin-bottom:12px;display:block;}
         .header h1{color:white;margin:0;font-size:1.6rem;font-weight:800;}
         .header p{color:rgba(255,255,255,.7);margin:8px 0 0;font-size:.95rem;}
@@ -26,7 +26,7 @@
 <div class="card">
     <div class="header">
         <i>🎓</i>
-        <h1>Welcome to BelTei University!</h1>
+        <h1>Welcome to LEARN Academy!</h1>
         <p>Student Registration Confirmed</p>
     </div>
     <div class="body">
@@ -68,7 +68,7 @@
         </p>
     </div>
     <div class="footer">
-        <strong>BelTei University Admin</strong><br>
+        <strong>LEARN Academy Admin</strong><br>
         &copy; {{ date('Y') }} Student Management System. All rights reserved.
     </div>
 </div>

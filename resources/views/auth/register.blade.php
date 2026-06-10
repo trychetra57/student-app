@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Student Management System</title>
+    <title>Register - LEARN Academy</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@100;300;400;700;900&family=Moul&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #f7f7f8 0%, #f8f8f9 100%);
+            background: linear-gradient(135deg, #eff7ff 0%, #dee8ed 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Open Sans', 'Battambang', sans-serif;
             padding: 20px 0;
         }
         .register-container {
@@ -28,7 +31,7 @@
             overflow: hidden;
         }
         .register-header {
-            background: linear-gradient(135deg, #3d8bfd 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #125875 0%, #0d3f54 100%);
             color: white;
             padding: 40px 20px;
             text-align: center;
@@ -66,18 +69,19 @@
             box-shadow: 0 0 0 0.2rem rgba(61, 139, 253, 0.25);
         }
         .btn-register {
-            background: linear-gradient(135deg, #3d8bfd 0%, #2563eb 100%);
+            background: linear-gradient(135deg, #ff7350 0%, #e05e3c 100%);
             border: none;
             border-radius: 8px;
             padding: 12px 20px;
             font-weight: 600;
             width: 100%;
             margin-top: 10px;
+            color: white;
         }
         .btn-register:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            background: linear-gradient(135deg, #e05e3c 0%, #c74a2a 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(61, 139, 253, 0.4);
+            box-shadow: 0 5px 20px rgba(255, 115, 80, 0.4);
         }
         .login-link {
             text-align: center;
@@ -90,7 +94,7 @@
             color: #666;
         }
         .login-link a {
-            color: #3d8bfd;
+            color: #125875;
             font-weight: 600;
             text-decoration: none;
         }
@@ -123,8 +127,8 @@
     <div class="register-container">
         <div class="register-card">
             <div class="register-header">
-                <i class="fas fa-user-plus"></i>
-                <h1>Create Account</h1>
+                <div style="font-size: 3rem; margin-bottom: 12px; color: #ff7350;"><i class="fas fa-graduation-cap"></i></div>
+                <h1>LEARN Academy</h1>
                 <p>Join the Student Management System</p>
             </div>
 

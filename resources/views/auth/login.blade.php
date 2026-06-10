@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Student Management System</title>
+    <title>Login - LEARN Academy</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@100;300;400;700;900&family=Moul&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <style>
         body {
-            background: url('{{ asset('images/university_building.jpg') }}') no-repeat center center fixed;
-            background-size: cover;
+            background: linear-gradient(135deg, #eff7ff 0%, #dee8ed 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Open Sans', 'Battambang', sans-serif;
         }
         .login-container {
             width: 100%;
@@ -28,7 +30,7 @@
             overflow: hidden;
         }
         .login-header {
-            background: linear-gradient(135deg, #1a56e8 0%, #0d3ecc 100%);
+            background: linear-gradient(135deg, #125875 0%, #0d3f54 100%);
             color: white;
             padding: 40px 20px;
             text-align: center;
@@ -64,7 +66,7 @@
             box-shadow: 0 0 0 0.2rem rgba(61, 139, 253, 0.25);
         }
         .btn-login {
-            background: linear-gradient(135deg, #e01a1a 0%, #cc0d0d 100%);
+            background: linear-gradient(135deg, #ff7350 0%, #e05e3c 100%);
             border: none;
             border-radius: 8px;
             padding: 12px 20px;
@@ -74,9 +76,9 @@
             color: white;
         }
         .btn-login:hover {
-            background: linear-gradient(135deg, #c91010 0%, #b00000 100%);
+            background: linear-gradient(135deg, #e05e3c 0%, #c74a2a 100%);
             transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(220, 38, 38, 0.4);
+            box-shadow: 0 5px 20px rgba(255, 115, 80, 0.4);
         }
         .remember-me {
             display: flex;
@@ -97,7 +99,7 @@
             color: #666;
         }
         .register-link a {
-            color: #f8f9fa;
+            color: #125875;
             font-weight: 600;
             text-decoration: none;
         }
@@ -129,8 +131,8 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <i class="fas fa-graduation-cap"></i>
-                <h1>Student Management</h1>
+                <div style="font-size: 3rem; margin-bottom: 12px; color: #ff7350;"><i class="fas fa-graduation-cap"></i></div>
+                <h1>LEARN Academy</h1>
                 <p>Login to your account</p>
             </div>
 

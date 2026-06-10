@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Classes - BelTei University Admin')
+@section('title', 'Classes - LEARN Academy Admin')
 
 @section('styles')
 <style>
@@ -194,8 +194,10 @@
                                     {{ ucfirst($class->status) }}
                                 </span>
                             </td>
-                            <td>
                                 <div class="d-flex gap-1">
+                                    <a href="{{ route('classes.enroll.show', $class) }}" class="btn btn-sm btn-outline-primary" title="Enroll Students">
+                                        <i class="fas fa-user-plus"></i>
+                                    </a>
                                     <a href="{{ route('classes.edit', $class) }}" class="btn btn-sm btn-outline-secondary" title="Edit">
                                         <i class="fas fa-edit"></i>
                                     </a>

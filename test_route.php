@@ -1,13 +1,14 @@
 <?php
 require 'vendor/autoload.php';
 $app = require_once 'bootstrap/app.php';
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 $user = \App\Models\User::first();
 if (!$user) {
     die("No user found");
 }
 
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
 $request = Illuminate\Http\Request::create('/students', 'GET', ['search' => 'test']);
 $request->setUserResolver(function () use ($user) {
     return $user;

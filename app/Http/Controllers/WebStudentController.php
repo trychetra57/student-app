@@ -261,6 +261,11 @@ class WebStudentController extends Controller
             'new_this_month'     => Student::whereMonth('created_at',now()->month)->whereYear('created_at',now()->year)->count(),
             'total_documents'    => StudentDocument::count(),
             'total_classes'      => \App\Models\SchoolClass::count(),
+            'active_staffs'      => \App\Models\User::whereIn('role', ['staff', 'teacher'])->count(),
+            'system_logs'        => \App\Models\AuditLog::count(),
+            'daily_phone_logs'   => 0,
+            'daily_enquiries'    => 0,
+            'daily_postal_exchanges' => 0,
         ];
 
         $gradeStats = Student::selectRaw('grade, count(*) as count')

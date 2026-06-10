@@ -20,7 +20,7 @@ class StudentWelcomeMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Welcome to BelTei University, '.$this->student->name.'!')
+        return $this->subject('Welcome to LEARN Academy, '.$this->student->name.'!')
                     ->view('emails.student_welcome');
     }
 }

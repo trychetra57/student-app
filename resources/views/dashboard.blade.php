@@ -8,7 +8,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     .dashboard-wrap {
-        font-family: 'Inter', sans-serif;
+        font-family: 'Open Sans', 'Battambang', sans-serif;
         background: #f0f2f8;
         min-height: 100vh;
         padding: 0 0 40px;
@@ -16,7 +16,7 @@
 
     /* ── Hero Banner ── */
     .dash-hero {
-        background: linear-gradient(135deg, #312e81 0%, #4f46e5 50%, #6366f1 100%);
+        background: linear-gradient(135deg, #0d3f54 0%, #125875 100%);
         color: white;
         padding: 36px 36px 80px;
         position: relative;
@@ -133,30 +133,30 @@
     }
 
     /* Card accent colors */
-    .sc-blue  .icon-wrap { background: linear-gradient(135deg,#4f46e5,#818cf8); }
-    .sc-blue  .stat-num  { color: #a16207; }
-    .sc-blue  .stat-trend { background:#fef08a; color:#4338ca; }
-    .sc-blue::after       { background:#4f46e5; }
+    .sc-blue  .icon-wrap { background: linear-gradient(135deg,#125875,#1583b1); }
+    .sc-blue  .stat-num  { color: #125875; }
+    .sc-blue  .stat-trend { background:#e6f2f7; color:#125875; }
+    .sc-blue::after       { background:#125875; }
 
-    .sc-green .icon-wrap { background: linear-gradient(135deg,#16a34a,#4ade80); }
-    .sc-green .stat-num  { color: #15803d; }
-    .sc-green .stat-trend { background:#dcfce7; color:#166534; }
-    .sc-green::after      { background:#16a34a; }
+    .sc-green .icon-wrap { background: linear-gradient(135deg,#01aa59,#10b981); }
+    .sc-green .stat-num  { color: #01aa59; }
+    .sc-green .stat-trend { background:#dcfce7; color:#01aa59; }
+    .sc-green::after      { background:#01aa59; }
 
-    .sc-purple .icon-wrap { background: linear-gradient(135deg,#7c3aed,#a78bfa); }
-    .sc-purple .stat-num  { color: #6d28d9; }
-    .sc-purple .stat-trend { background:#ede9fe; color:#5b21b6; }
-    .sc-purple::after      { background:#7c3aed; }
+    .sc-purple .icon-wrap { background: linear-gradient(135deg,#0d3f54,#125875); }
+    .sc-purple .stat-num  { color: #0d3f54; }
+    .sc-purple .stat-trend { background:#e6f2f7; color:#0d3f54; }
+    .sc-purple::after      { background:#0d3f54; }
 
-    .sc-orange .icon-wrap { background: linear-gradient(135deg,#ea580c,#fb923c); }
-    .sc-orange .stat-num  { color: #c2410c; }
-    .sc-orange .stat-trend { background:#ffedd5; color:#c2410c; }
-    .sc-orange::after      { background:#ea580c; }
+    .sc-orange .icon-wrap { background: linear-gradient(135deg,#ff7350,#fca5a5); }
+    .sc-orange .stat-num  { color: #ff7350; }
+    .sc-orange .stat-trend { background:#ffedd5; color:#ff7350; }
+    .sc-orange::after      { background:#ff7350; }
 
-    .sc-rose .icon-wrap { background: linear-gradient(135deg,#e11d48,#fb7185); }
-    .sc-rose .stat-num  { color: #be123c; }
-    .sc-rose .stat-trend { background:#ffe4e6; color:#be123c; }
-    .sc-rose::after      { background:#e11d48; }
+    .sc-rose .icon-wrap { background: linear-gradient(135deg,#ff7350,#e05e3c); }
+    .sc-rose .stat-num  { color: #ff7350; }
+    .sc-rose .stat-trend { background:#ffedd5; color:#ff7350; }
+    .sc-rose::after      { background:#ff7350; }
 
     .sc-teal .icon-wrap { background: linear-gradient(135deg,#0891b2,#22d3ee); }
     .sc-teal .stat-num  { color: #0e7490; }
@@ -178,7 +178,7 @@
         align-items: center;
         gap: 8px;
     }
-    .section-title i { color: #4f46e5; }
+    .section-title i { color: var(--primary); }
 
     /* ── Chart Cards ── */
     .chart-card {
@@ -207,8 +207,8 @@
         font-weight: 600;
         padding: 4px 10px;
         border-radius: 20px;
-        background: #e0e7ff;
-        color: #4f46e5;
+        background: var(--primary-light);
+        color: var(--primary);
     }
 
     /* ── Quick Actions ── */
@@ -233,7 +233,7 @@
         font-size: 0.88rem;
     }
     .action-btn:last-child { margin-bottom: 0; }
-    .action-btn:hover { border-color: #4f46e5; color: #4f46e5; background: #e0e7ff; transform: translateX(4px); }
+    .action-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); transform: translateX(4px); }
     .action-btn .ab-icon {
         width: 36px; height: 36px;
         border-radius: 10px;
@@ -302,68 +302,129 @@
                 <a href="{{ route('students.export') }}" class="btn-hero">
                     <i class="fas fa-download"></i> Export CSV
                 </a>
+                <style>
+        .stat-card-custom-blue {
+            background: #1583b1;
+            color: white;
+            border-radius: 4px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            transition: transform 0.2s;
+            border: none;
+        }
+        .stat-card-custom-blue:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+        .stat-card-custom-green {
+            background: #0fa180;
+            color: white;
+            border-radius: 4px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            transition: transform 0.2s;
+            border: none;
+        }
+        .stat-card-custom-green:hover {
+            transform: translateY(-2px);
+            opacity: 0.95;
+        }
+        .icon-wrap-custom {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            position: absolute;
+            right: 20px;
+            bottom: 20px;
+        }
+        .num-custom {
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-top: 8px;
+            margin-bottom: 0;
+        }
+        .label-custom {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.85);
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+    </style>
+
+    {{-- ── Stat Cards (Matches Sample Screenshot) ── --}}
+    <div class="stats-row">
+        <div class="row g-3 mb-3">
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card-custom-blue">
+                    <div class="label-custom">Active Students</div>
+                    <div class="num-custom counter" data-target="{{ $stats['active_students'] }}">0</div>
+                    <div class="icon-wrap-custom"><i class="fas fa-graduation-cap"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card-custom-blue">
+                    <div class="label-custom">Active Staffs</div>
+                    <div class="num-custom counter" data-target="{{ $stats['active_staffs'] }}">0</div>
+                    <div class="icon-wrap-custom"><i class="fas fa-users"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card-custom-blue">
+                    <div class="label-custom">Total Classes</div>
+                    <div class="num-custom counter" data-target="{{ $stats['total_classes'] }}">0</div>
+                    <div class="icon-wrap-custom"><i class="fas fa-door-open"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card-custom-blue">
+                    <div class="label-custom">Total Documents</div>
+                    <div class="num-custom counter" data-target="{{ $stats['total_documents'] }}">0</div>
+                    <div class="icon-wrap-custom"><i class="fas fa-file-alt"></i></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row g-3">
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card-custom-green">
+                    <div class="label-custom">Daily Phone Logs</div>
+                    <div class="num-custom counter" data-target="{{ $stats['daily_phone_logs'] }}">0</div>
+                    <div class="icon-wrap-custom"><i class="fas fa-phone"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card-custom-green">
+                    <div class="label-custom">Daily Enquiries</div>
+                    <div class="num-custom counter" data-target="{{ $stats['daily_enquiries'] }}">0</div>
+                    <div class="icon-wrap-custom"><i class="fas fa-question-circle"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card-custom-green">
+                    <div class="label-custom">Daily Postal Exchanges</div>
+                    <div class="num-custom counter" data-target="{{ $stats['daily_postal_exchanges'] }}">0</div>
+                    <div class="icon-wrap-custom"><i class="fas fa-exchange-alt"></i></div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-md-3">
+                <div class="stat-card-custom-green">
+                    <div class="label-custom">System Audit Logs</div>
+                    <div class="num-custom counter" data-target="{{ $stats['system_logs'] }}">0</div>
+                    <div class="icon-wrap-custom"><i class="fas fa-history"></i></div>
+                </div>
             </div>
         </div>
     </div>
-
-    {{-- ── Stat Cards ── --}}
-    <div class="stats-row">
-        <div class="row g-3">
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="stat-card sc-blue">
-                    <div class="icon-wrap"><i class="fas fa-users"></i></div>
-                    <div class="stat-num counter" data-target="{{ $stats['total_students'] }}">0</div>
-                    <div class="stat-label">Total Students</div>
-                    <div class="stat-trend"><i class="fas fa-database"></i> All Records</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="stat-card sc-green">
-                    <div class="icon-wrap"><i class="fas fa-check-circle"></i></div>
-                    <div class="stat-num counter" data-target="{{ $stats['active_students'] }}">0</div>
-                    <div class="stat-label">Active</div>
-                    <div class="stat-trend"><i class="fas fa-circle"></i> Enrolled</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="stat-card sc-rose">
-                    <div class="icon-wrap"><i class="fas fa-times-circle"></i></div>
-                    <div class="stat-num counter" data-target="{{ $stats['inactive_students'] }}">0</div>
-                    <div class="stat-label">Inactive</div>
-                    <div class="stat-trend"><i class="fas fa-pause-circle"></i> On Hold</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="stat-card sc-purple">
-                    <div class="icon-wrap"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="stat-num counter" data-target="{{ $stats['graduated_students'] }}">0</div>
-                    <div class="stat-label">Graduated</div>
-                    <div class="stat-trend"><i class="fas fa-award"></i> Alumni</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="stat-card sc-orange">
-                    <div class="icon-wrap"><i class="fas fa-user-plus"></i></div>
-                    <div class="stat-num counter" data-target="{{ $stats['new_this_month'] }}">0</div>
-                    <div class="stat-label">New This Month</div>
-                    <div class="stat-trend"><i class="fas fa-calendar"></i> {{ now()->format('M Y') }}</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="stat-card sc-teal">
-                    <div class="icon-wrap"><i class="fas fa-file-alt"></i></div>
-                    <div class="stat-num counter" data-target="{{ $stats['total_documents'] }}">0</div>
-                    <div class="stat-label">Documents</div>
-                    <div class="stat-trend"><i class="fas fa-paperclip"></i> Uploaded</div>
-                </div>
-            </div>
-            <div class="col-6 col-md-4 col-lg-2">
-                <div class="stat-card sc-blue">
-                    <div class="icon-wrap" style="background: linear-gradient(135deg,#8b5cf6,#d946ef)"><i class="fas fa-door-open"></i></div>
-                    <div class="stat-num counter" data-target="{{ $stats['total_classes'] ?? 0 }}">0</div>
-                    <div class="stat-label">Total Classes</div>
-                    <div class="stat-trend"><i class="fas fa-chalkboard"></i> Scheduled</div>
-                </div>
             </div>
         </div>
     </div>
@@ -437,11 +498,11 @@
                                 </div>
                                 <div class="progress-wrap">
                                     <div class="progress-label">
-                                        <span><i class="fas fa-circle" style="color:#7c3aed"></i>&nbsp;Graduated</span>
+                                        <span><i class="fas fa-circle text-warning me-1" style="color:#ff7350 !important"></i>&nbsp;Graduated</span>
                                         <span>{{ $stats['graduated_students'] }} ({{ $graduatedPct }}%)</span>
                                     </div>
                                     <div class="progress">
-                                        <div class="progress-bar" style="width:0%;background:#7c3aed" data-width="{{ $graduatedPct }}%"></div>
+                                        <div class="progress-bar" style="width:0%;background:#ff7350" data-width="{{ $graduatedPct }}%"></div>
                                     </div>
                                 </div>
 
@@ -449,15 +510,15 @@
                                 <div class="mt-4 pt-3 border-top">
                                     <div class="row text-center g-2">
                                         <div class="col-4">
-                                            <div style="font-size:1.4rem;font-weight:800;color:#16a34a">{{ $stats['active_students'] }}</div>
+                                            <div style="font-size:1.4rem;font-weight:800;color:#01aa59">{{ $stats['active_students'] }}</div>
                                             <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase">Active</div>
                                         </div>
                                         <div class="col-4">
-                                            <div style="font-size:1.4rem;font-weight:800;color:#e11d48">{{ $stats['inactive_students'] }}</div>
+                                            <div style="font-size:1.4rem;font-weight:800;color:#ff7350">{{ $stats['inactive_students'] }}</div>
                                             <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase">Inactive</div>
                                         </div>
                                         <div class="col-4">
-                                            <div style="font-size:1.4rem;font-weight:800;color:#7c3aed">{{ $stats['graduated_students'] }}</div>
+                                            <div style="font-size:1.4rem;font-weight:800;color:#0d3f54">{{ $stats['graduated_students'] }}</div>
                                             <div style="font-size:0.72rem;color:#94a3b8;font-weight:600;text-transform:uppercase">Graduated</div>
                                         </div>
                                     </div>
@@ -491,15 +552,15 @@
                                 <span class="section-title"><i class="fas fa-bolt"></i> Quick Actions</span>
                             </div>
                             <a href="{{ route('students.create') }}" class="action-btn">
-                                <div class="ab-icon" style="background:#e0e7ff;color:#4f46e5"><i class="fas fa-user-plus"></i></div>
+                                <div class="ab-icon" style="background:var(--primary-light);color:var(--primary)"><i class="fas fa-user-plus"></i></div>
                                 Add New Student
                             </a>
                             <a href="{{ route('students.index') }}" class="action-btn">
-                                <div class="ab-icon" style="background:#f0fdf4;color:#16a34a"><i class="fas fa-list"></i></div>
+                                <div class="ab-icon" style="background:#dcfce7;color:#01aa59"><i class="fas fa-list"></i></div>
                                 View All Students
                             </a>
                             <a href="{{ route('students.export') }}" class="action-btn">
-                                <div class="ab-icon" style="background:#fff7ed;color:#ea580c"><i class="fas fa-file-csv"></i></div>
+                                <div class="ab-icon" style="background:#ffedd5;color:#ff7350"><i class="fas fa-file-csv"></i></div>
                                 Export to CSV
                             </a>
                             <a href="{{ route('audit.index') }}" class="action-btn">
@@ -507,7 +568,7 @@
                                 View Audit Logs
                             </a>
                             <a href="{{ route('backup.index') }}" class="action-btn">
-                                <div class="ab-icon" style="background:#f0fdfa;color:#0891b2"><i class="fas fa-database"></i></div>
+                                <div class="ab-icon" style="background:#e6f2f7;color:#125875"><i class="fas fa-database"></i></div>
                                 Manage Backups
                             </a>
                         </div>
@@ -526,7 +587,7 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
                                     <span class="text-muted">Role</span>
-                                    <span class="badge rounded-pill" style="background:#e0e7ff;color:#4f46e5;font-size:0.78rem">
+                                    <span class="badge rounded-pill" style="background:var(--primary-light);color:var(--primary);font-size:0.78rem">
                                         {{ ucfirst(Auth::user()->role ?? 'staff') }}
                                     </span>
                                 </div>
@@ -584,7 +645,7 @@ document.addEventListener('DOMContentLoaded', function () {
             datasets: [{
                 label: 'Students',
                 data: [{{ $stats['active_students'] }}, {{ $stats['inactive_students'] }}, {{ $stats['graduated_students'] }}],
-                backgroundColor: ['rgba(22,163,74,0.85)','rgba(225,29,72,0.85)','rgba(124,58,237,0.85)'],
+                backgroundColor: ['rgba(1,170,89,0.85)','rgba(255,115,80,0.85)','rgba(13,63,84,0.85)'],
                 borderRadius: 10, borderSkipped: false, borderWidth: 0,
             }]
         },
@@ -607,7 +668,7 @@ document.addEventListener('DOMContentLoaded', function () {
         data: {
             labels: @json($gradeStats->pluck('grade')),
             datasets: [{ data: @json($gradeStats->pluck('count')),
-                backgroundColor: ['#4f46e5','#16a34a','#7c3aed','#ea580c','#0891b2','#e11d48','#4338ca','#64748b'],
+                backgroundColor: ['#125875','#01aa59','#0d3f54','#ff7350','#0891b2','#e11d48','#4338ca','#64748b'],
                 borderWidth: 3, borderColor: '#ffffff', hoverOffset: 8 }]
         },
         options: {
@@ -628,10 +689,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     label: 'New Students',
                     data: @json(collect($monthlyData)->pluck('count')),
-                    borderColor: '#4f46e5',
-                    backgroundColor: 'rgba(79,70,229,0.08)',
+                    borderColor: '#125875',
+                    backgroundColor: 'rgba(18,88,117,0.08)',
                     borderWidth: 2.5,
-                    pointBackgroundColor: '#4f46e5',
+                    pointBackgroundColor: '#125875',
                     pointRadius: 5,
                     pointHoverRadius: 7,
                     fill: true,

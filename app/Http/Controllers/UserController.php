@@ -82,4 +82,10 @@ class UserController extends Controller
         $status = $user->is_active ? 'activated' : 'deactivated';
         return redirect()->back()->with('success', "User {$status}.");
     }
+
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('users.profile', compact('user'));
+    }
 }

@@ -96,4 +96,25 @@ class WebSchoolClassController extends Controller
         return redirect()->route('classes.index')
             ->with('success', "Class '{$class->name}' deleted.");
     }
+
+    public function showEnrollment(SchoolClass $class)
+    {
+        $class->load('students');
+        $enrolledIds = $class->students->pluck('id')->toArray();
+        $availableStudents = \App\Models\Student::whereNotIn('id', $enrolledIds)->orderBy('name')->get();
+        return view('classes.enroll', compact('class', 'availableStudents'));
+    }
+
+    public function enrollStudents(Request $request, SchoolClass $class)
+    {
+        $data = $request->validate([
+            'student_ids' => 'required|array',
+            'student_ids.*' => 'exists:students,id',
+        ]);
+
+        $class->students()->syncWithoutDetaching($data['student_ids']);
+
+        return redirect()->route('classes.enroll.show', $class)
+            ->with('success', 'Students enrolled successfully!');
+    }
 }
