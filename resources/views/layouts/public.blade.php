@@ -433,9 +433,9 @@
                     <ul class="footer-links mt-3" style="list-style: none; padding: 0;">
                         <li style="margin-bottom: 12px;"><a href="{{ route('placement-test') }}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: var(--transition); display: inline-block;">Admission</a></li>
                         <li style="margin-bottom: 12px;"><a href="{{ route('programs') }}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: var(--transition); display: inline-block;">Our learning program</a></li>
-                        <li style="margin-bottom: 12px;"><a href="{{ route('tuition') }}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: var(--transition); display: inline-block;">Tuition Fees & Key Dates</a></li>
-                        <li style="margin-bottom: 12px;"><a href="{{ route('services') }}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: var(--transition); display: inline-block;">Language Support & Services</a></li>
-                        <li style="margin-bottom: 12px;"><a href="{{ route('success-hub') }}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: var(--transition); display: inline-block;">Success Hub & Testimonials</a></li>
+                        @foreach($publicFooterPages as $pPage)
+                            <li style="margin-bottom: 12px;"><a href="{{ route('public.pages.show', $pPage->slug) }}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: var(--transition); display: inline-block;">{{ $pPage->title }}</a></li>
+                        @endforeach
                     </ul>
                 </div>
 

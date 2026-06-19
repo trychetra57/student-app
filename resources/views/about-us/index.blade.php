@@ -20,21 +20,31 @@
                     <h5 class="fw-bold text-dark mb-0"><i class="fas fa-edit me-2"></i> Edit Institution Statement</h5>
                 </div>
                 <div class="card-body">
-                    <form onsubmit="event.preventDefault(); Swal.fire('Save Successful', 'Mock settings for About Us successfully saved!', 'success')">
+                    <form action="{{ route('admin.about-us.update') }}" method="POST">
+                        @csrf
                         <div class="row g-3">
                             <div class="col-12">
                                 <label class="form-label fw-bold small text-muted">About Us (Introduction Text)</label>
-                                <textarea class="form-control rounded-3" rows="5">LEARN Academy is Cambodia's premier English school, specializing in outcome-based academic preparation, interactive language courses, and student success support programs.</textarea>
+                                <textarea class="form-control rounded-3 @error('about_us_text') is-invalid @enderror" name="about_us_text" rows="5" required>{{ old('about_us_text', $settings['about_us_text']) }}</textarea>
+                                @error('about_us_text')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-bold small text-muted">Our Mission Statement</label>
-                                <textarea class="form-control rounded-3" rows="4">To deliver high-impact, communicative English training that equips students with real-world skills, enabling academic and professional growth globally.</textarea>
+                                <textarea class="form-control rounded-3 @error('mission') is-invalid @enderror" name="mission" rows="4" required>{{ old('mission', $settings['mission']) }}</textarea>
+                                @error('mission')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-12 col-md-6">
                                 <label class="form-label fw-bold small text-muted">Our Vision Statement</label>
-                                <textarea class="form-control rounded-3" rows="4">To be recognized as the regional gold standard in language learning, cultivating confident communicators who achieve excellence in their selected fields.</textarea>
+                                <textarea class="form-control rounded-3 @error('vision') is-invalid @enderror" name="vision" rows="4" required>{{ old('vision', $settings['vision']) }}</textarea>
+                                @error('vision')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-12">
@@ -44,20 +54,38 @@
 
                             <div class="col-12 col-md-4">
                                 <label class="form-label small text-muted">Value 1 (Title)</label>
-                                <input type="text" class="form-control rounded-3 mb-2" value="Academic Excellence">
-                                <textarea class="form-control rounded-3 small" rows="2">We push for high academic goals and prepare students with the practical capability to pass benchmarks.</textarea>
+                                <input type="text" class="form-control rounded-3 mb-2 @error('value_1_title') is-invalid @enderror" name="value_1_title" value="{{ old('value_1_title', $settings['value_1_title']) }}" required>
+                                @error('value_1_title')
+                                    <div class="invalid-feedback mb-2">{{ $message }}</div>
+                                @enderror
+                                <textarea class="form-control rounded-3 small @error('value_1_description') is-invalid @enderror" name="value_1_description" rows="3" required>{{ old('value_1_description', $settings['value_1_description']) }}</textarea>
+                                @error('value_1_description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-12 col-md-4">
                                 <label class="form-label small text-muted">Value 2 (Title)</label>
-                                <input type="text" class="form-control rounded-3 mb-2" value="Communicative Quality">
-                                <textarea class="form-control rounded-3 small" rows="2">We construct our modules around modern interactive and speaking sessions for active confidence.</textarea>
+                                <input type="text" class="form-control rounded-3 mb-2 @error('value_2_title') is-invalid @enderror" name="value_2_title" value="{{ old('value_2_title', $settings['value_2_title']) }}" required>
+                                @error('value_2_title')
+                                    <div class="invalid-feedback mb-2">{{ $message }}</div>
+                                @enderror
+                                <textarea class="form-control rounded-3 small @error('value_2_description') is-invalid @enderror" name="value_2_description" rows="3" required>{{ old('value_2_description', $settings['value_2_description']) }}</textarea>
+                                @error('value_2_description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-12 col-md-4">
                                 <label class="form-label small text-muted">Value 3 (Title)</label>
-                                <input type="text" class="form-control rounded-3 mb-2" value="Outcome-Focused Support">
-                                <textarea class="form-control rounded-3 small" rows="2">We offer language advisors, Peer Teaching mentors, and internships to solidify job readyness.</textarea>
+                                <input type="text" class="form-control rounded-3 mb-2 @error('value_3_title') is-invalid @enderror" name="value_3_title" value="{{ old('value_3_title', $settings['value_3_title']) }}" required>
+                                @error('value_3_title')
+                                    <div class="invalid-feedback mb-2">{{ $message }}</div>
+                                @enderror
+                                <textarea class="form-control rounded-3 small @error('value_3_description') is-invalid @enderror" name="value_3_description" rows="3" required>{{ old('value_3_description', $settings['value_3_description']) }}</textarea>
+                                @error('value_3_description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
 
                             <div class="col-12 text-end mt-4">
@@ -82,19 +110,15 @@
                             <span class="badge bg-primary rounded-pill"><i class="fas fa-school"></i></span>
                             <strong class="text-primary small">LEARN Academy</strong>
                         </div>
-                        <p class="small text-muted mb-0">"Our mission is to deliver high-impact, communicative English training..."</p>
+                        <p class="small text-muted mb-0">"Our mission is to: {{ Str::limit($settings['mission'], 120) }}..."</p>
                     </div>
                     <div class="d-flex justify-content-between text-muted small py-2 border-bottom">
-                        <span>Last Updated By</span>
-                        <strong class="text-dark">Admin Super</strong>
+                        <span>Institution Name</span>
+                        <strong class="text-dark">LEARN Academy</strong>
                     </div>
                     <div class="d-flex justify-content-between text-muted small py-2 border-bottom">
-                        <span>Last Edited Date</span>
-                        <strong class="text-dark">June 9, 2026</strong>
-                    </div>
-                    <div class="d-flex justify-content-between text-muted small py-2">
-                        <span>Revision Version</span>
-                        <strong class="text-dark">v1.4.2</strong>
+                        <span>Database Status</span>
+                        <strong class="text-success"><i class="fas fa-check-circle"></i> Connected</strong>
                     </div>
                 </div>
             </div>

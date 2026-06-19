@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(TeacherSeeder::class);
         Student::factory(10)->create();
         $this->call(AcademicRecordSeeder::class);
+        $this->call(FrontWebSeeder::class);
     }
 }

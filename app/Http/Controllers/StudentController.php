@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Student;
 use App\Models\AuditLog;
+use App\Models\SchoolClass;
+use App\Models\Student;
+use App\Models\StudentDocument;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Controllers\Controller;
@@ -59,13 +64,13 @@ class StudentController extends Controller
             'new_this_month' => Student::whereMonth('created_at', now()->month)
                                         ->whereYear('created_at', now()->year)
                                         ->count(),
-            'total_users' => \App\Models\User::count(),
-            'total_documents' => \App\Models\StudentDocument::count(),
-            'total_audit_logs' => \App\Models\AuditLog::count(),
+            'total_users' => User::count(),
+            'total_documents' => StudentDocument::count(),
+            'total_audit_logs' => AuditLog::count(),
             // Placeholders for features not yet implemented to match UI request
             'fees_collection' => 0,
             'banks' => 0,
-            'classes' => \App\Models\SchoolClass::count(),
+            'classes' => SchoolClass::count(),
             'hostels' => 0,
             'exam_results' => 0,
             'events' => 0,
@@ -321,13 +326,13 @@ class StudentController extends Controller
 
             foreach ($students as $student) {
                 fputcsv($file, [
-                    $student->id,
+                            $student->id,
                     $student->name,
                     $student->email,
                     $student->phone,
                     $student->grade,
                     $student->address,
-                    $student->date_of_birth ? \Carbon\Carbon::parse($student->date_of_birth)->format('Y-m-d') : '',
+                    $student->date_of_birth ? Carbon::parse($student->date_of_birth)->format('Y-m-d') : '',
                     $student->guardian_name,
                     $student->guardian_phone,
                     $student->status,
@@ -355,7 +360,7 @@ class StudentController extends Controller
             'file_name' => $file->getClientOriginalName(),
             'file_type' => $file->getClientOriginalExtension(),
             'document_type' => $request->type,
-            'uploaded_by' => auth()->id(),
+            'uploaded_by' => Auth::id(),
         ]);
 
         return response()->json([
@@ -365,12 +370,12 @@ class StudentController extends Controller
         ], 201);
     }
 
-    public function downloadDocument(\App\Models\StudentDocument $document)
+    public function downloadDocument(StudentDocument $document)
     {
         return Storage::download($document->file_path, $document->file_name);
     }
 
-    public function deleteDocument(\App\Models\StudentDocument $document)
+    public function deleteDocument(StudentDocument $document)
     {
         $oldValues = $document->toArray();
         $student = $document->student;
@@ -388,8 +393,8 @@ class StudentController extends Controller
 
     private function logAudit($action, $model, $oldValues = null, $newValues = null)
     {
-        \App\Models\AuditLog::create([
-            'user_id' => auth()->id() ?? 1, // Fallback if no user
+        AuditLog::create([
+            'user_id' => Auth::id() ?? 1, // Fallback if no user
             'model_type' => get_class($model),
             'model_id' => $model->id,
             'action' => $action,

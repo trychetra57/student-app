@@ -21,6 +21,7 @@ Route::get('/placement-test', [PublicController::class, 'placementTest'])->name(
 Route::post('/placement-test/submit', [PublicController::class, 'submitPlacementTest'])->name('placement-test.submit');
 Route::get('/success-hub', [PublicController::class, 'successHub'])->name('success-hub');
 Route::post('/contact-submit', [PublicController::class, 'contactSubmit'])->name('contact.submit');
+Route::get('/pages/{slug}', [PublicController::class, 'showPage'])->name('public.pages.show');
 
 // ─── Auth Routes ──────────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -60,12 +61,43 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [UserController::class, 'profile'])->name('users.profile');
 
     // Front Web Management
+    // Sliders
     Route::get('/admin/sliders', [FrontWebController::class, 'sliders'])->name('admin.sliders.index');
+    Route::post('/admin/sliders', [FrontWebController::class, 'storeSlider'])->name('admin.sliders.store');
+    Route::post('/admin/sliders/{slider}', [FrontWebController::class, 'updateSlider'])->name('admin.sliders.update');
+    Route::delete('/admin/sliders/{slider}', [FrontWebController::class, 'destroySlider'])->name('admin.sliders.destroy');
+    Route::post('/admin/sliders/{slider}/toggle', [FrontWebController::class, 'toggleSliderStatus'])->name('admin.sliders.toggle');
+    Route::post('/admin/sliders/reorder', [FrontWebController::class, 'reorderSliders'])->name('admin.sliders.reorder');
+
+    // About Us
     Route::get('/admin/about-us', [FrontWebController::class, 'aboutUs'])->name('admin.about-us.index');
+    Route::post('/admin/about-us', [FrontWebController::class, 'updateAboutUs'])->name('admin.about-us.update');
+
+    // Courses
     Route::get('/admin/courses', [FrontWebController::class, 'courses'])->name('admin.courses.index');
+    Route::post('/admin/courses', [FrontWebController::class, 'storeCourse'])->name('admin.courses.store');
+    Route::put('/admin/courses/{course}', [FrontWebController::class, 'updateCourse'])->name('admin.courses.update');
+    Route::delete('/admin/courses/{course}', [FrontWebController::class, 'destroyCourse'])->name('admin.courses.destroy');
+    Route::post('/admin/courses/{course}/toggle', [FrontWebController::class, 'toggleCourseStatus'])->name('admin.courses.toggle');
+
+    // News
     Route::get('/admin/news', [FrontWebController::class, 'news'])->name('admin.news.index');
+    Route::post('/admin/news', [FrontWebController::class, 'storeNews'])->name('admin.news.store');
+    Route::post('/admin/news/{news}', [FrontWebController::class, 'updateNews'])->name('admin.news.update');
+    Route::delete('/admin/news/{news}', [FrontWebController::class, 'destroyNews'])->name('admin.news.destroy');
+    Route::post('/admin/news/{news}/toggle', [FrontWebController::class, 'toggleNewsStatus'])->name('admin.news.toggle');
+
+    // Galleries
     Route::get('/admin/galleries', [FrontWebController::class, 'galleries'])->name('admin.galleries.index');
+    Route::post('/admin/galleries', [FrontWebController::class, 'storeGallery'])->name('admin.galleries.store');
+    Route::delete('/admin/galleries/{gallery}', [FrontWebController::class, 'destroyGallery'])->name('admin.galleries.destroy');
+
+    // Footer Pages
     Route::get('/admin/footer-pages', [FrontWebController::class, 'footerPages'])->name('admin.footer-pages.index');
+    Route::post('/admin/footer-pages', [FrontWebController::class, 'storeFooterPage'])->name('admin.footer-pages.store');
+    Route::put('/admin/footer-pages/{page}', [FrontWebController::class, 'updateFooterPage'])->name('admin.footer-pages.update');
+    Route::delete('/admin/footer-pages/{page}', [FrontWebController::class, 'destroyFooterPage'])->name('admin.footer-pages.destroy');
+    Route::post('/admin/footer-pages/{page}/toggle', [FrontWebController::class, 'toggleFooterPageStatus'])->name('admin.footer-pages.toggle');
 
     // Audit Logs
     Route::get('/audit', [WebAuditController::class, 'index'])->name('audit.index');

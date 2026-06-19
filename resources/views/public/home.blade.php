@@ -6,12 +6,19 @@
 <style>
     /* Hero Section */
     .hero-section {
-        background: linear-gradient(135deg, rgba(18, 88, 117, 0.95) 0%, rgba(13, 63, 84, 0.9) 100%), 
-                    url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1470&auto=format&fit=crop') no-repeat center center/cover;
         color: white;
-        padding: 120px 0 100px;
+        padding: 0;
         position: relative;
         overflow: hidden;
+    }
+    .hero-slide {
+        padding: 120px 0 100px;
+        background-size: cover !important;
+        background-position: center center !important;
+        background-repeat: no-repeat !important;
+        min-height: 550px;
+        display: flex;
+        align-items: center;
     }
     .hero-content h1 {
         font-size: 3.5rem;
@@ -209,42 +216,91 @@
 @endsection
 
 @section('content')
-<!-- ── Hero Section with Promo Flyer ── -->
+<!-- ── Hero Section with Dynamic Sliders ── -->
 <section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center g-5">
-            <div class="col-lg-7 hero-content">
-                <span class="badge bg-danger px-3 py-2 mb-3 text-uppercase font-weight-bold" style="font-size:0.8rem; letter-spacing:1px;">New Semester 2026 Admissions Open</span>
-                <h1>Transform Your Future With Expert English Proficiency</h1>
-                <p>Welcome to LEARN Academy, the kingdom's top language institution. We build practical communication skills, business speaking capabilities, and academic writing mastery with modern certified courses.</p>
-                <div class="d-flex gap-3 flex-wrap">
-                    <a href="{{ route('placement-test') }}" class="btn btn-warning btn-lg px-4 py-3 text-white fw-bold shadow" style="background-color: var(--accent); border: none; border-radius: 30px;">
-                        <i class="fas fa-clipboard-list me-2"></i> Free Placement Test
-                    </a>
-                    <a href="#about-us" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold" style="border-radius: 30px;">
-                        <i class="fas fa-info-circle me-2"></i> Learn More
-                    </a>
-                </div>
+    @if($sliders->count() > 0)
+        <div id="homepageCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                @foreach($sliders as $index => $slide)
+                    <button type="button" data-bs-target="#homepageCarousel" data-bs-slide-to="{{ $index }}" class="{{ $index === 0 ? 'active' : '' }}" aria-current="{{ $index === 0 ? 'true' : 'false' }}"></button>
+                @endforeach
             </div>
-            <div class="col-lg-5">
-                <!-- Promo Flyer -->
-                <div class="promo-flyer">
-                    <div class="promo-badge">Special Rebranding Offer</div>
-                    <h3>Enroll & Save Up to 20%</h3>
-                    <p class="text-secondary">To celebrate our brand new academic structure at LEARN Academy, we are giving exclusive benefits to new students:</p>
-                    <ul>
-                        <li><i class="fas fa-check-circle"></i> 20% Off Tuition Fee for Term 1</li>
-                        <li><i class="fas fa-check-circle"></i> Free English Placement Test</li>
-                        <li><i class="fas fa-check-circle"></i> Complimentary Access to Self-access Labs</li>
-                        <li><i class="fas fa-check-circle"></i> Learn with UK/US Native Lecturers</li>
-                    </ul>
-                    <a href="{{ route('placement-test') }}" class="btn btn-success btn-lg w-100 py-3 fw-bold" style="border-radius: 12px; background-color: var(--success); border: none;">
-                        <i class="fas fa-arrow-right me-2"></i> Claim Rebranding Offer Now
-                    </a>
+            <div class="carousel-inner">
+                @foreach($sliders as $index => $slide)
+                    @php
+                        $imgPath = Str::startsWith($slide->image_path, 'http') ? $slide->image_path : asset($slide->image_path);
+                    @endphp
+                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}" data-bs-interval="6000">
+                        <div class="hero-slide" style="background: linear-gradient(135deg, rgba(18, 88, 117, 0.92) 0%, rgba(13, 63, 84, 0.85) 100%), url('{{ $imgPath }}');">
+                            <div class="container">
+                                <div class="row align-items-center g-5">
+                                    <div class="col-lg-7 hero-content">
+                                        <span class="badge bg-danger px-3 py-2 mb-3 text-uppercase font-weight-bold" style="font-size:0.8rem; letter-spacing:1px;">New Semester Admissions Open</span>
+                                        <h1>{{ $slide->title }}</h1>
+                                        <p>{{ $slide->subtitle }}</p>
+                                        <div class="d-flex gap-3 flex-wrap">
+                                            <a href="{{ $slide->target_url ?: route('placement-test') }}" class="btn btn-warning btn-lg px-4 py-3 text-white fw-bold shadow border-0" style="background-color: var(--accent); border-radius: 30px;">
+                                                <i class="fas fa-arrow-right me-2"></i> Get Started
+                                            </a>
+                                            <a href="#about-us" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold" style="border-radius: 30px;">
+                                                <i class="fas fa-info-circle me-2"></i> Learn More
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-5">
+                                        <!-- Promo Flyer -->
+                                        <div class="promo-flyer">
+                                            <div class="promo-badge">Special Rebranding Offer</div>
+                                            <h3>Enroll & Save Up to 20%</h3>
+                                            <p class="text-secondary">To celebrate our brand new academic structure at LEARN Academy, we are giving exclusive benefits to new students:</p>
+                                            <ul>
+                                                <li><i class="fas fa-check-circle"></i> 20% Off Tuition Fee for Term 1</li>
+                                                <li><i class="fas fa-check-circle"></i> Free English Placement Test</li>
+                                                <li><i class="fas fa-check-circle"></i> Complimentary Access to Self-access Labs</li>
+                                                <li><i class="fas fa-check-circle"></i> Learn with UK/US Native Lecturers</li>
+                                            </ul>
+                                            <a href="{{ route('placement-test') }}" class="btn btn-success btn-lg w-100 py-3 fw-bold border-0" style="border-radius: 12px; background-color: var(--success);">
+                                                <i class="fas fa-arrow-right me-2"></i> Claim Rebranding Offer Now
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#homepageCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#homepageCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    @else
+        <!-- Fallback static hero section -->
+        <div class="hero-slide" style="background: linear-gradient(135deg, rgba(18, 88, 117, 0.95) 0%, rgba(13, 63, 84, 0.9) 100%), url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1470&auto=format&fit=crop');">
+            <div class="container">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-7 hero-content">
+                        <span class="badge bg-danger px-3 py-2 mb-3 text-uppercase font-weight-bold" style="font-size:0.8rem; letter-spacing:1px;">New Semester 2026 Admissions Open</span>
+                        <h1>Transform Your Future With Expert English Proficiency</h1>
+                        <p>Welcome to LEARN Academy, the kingdom's top language institution. We build practical communication skills, business speaking capabilities, and academic writing mastery with modern certified courses.</p>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <a href="{{ route('placement-test') }}" class="btn btn-warning btn-lg px-4 py-3 text-white fw-bold shadow border-0" style="background-color: var(--accent); border-radius: 30px;">
+                                <i class="fas fa-clipboard-list me-2"></i> Free Placement Test
+                            </a>
+                            <a href="#about-us" class="btn btn-outline-light btn-lg px-4 py-3 fw-bold" style="border-radius: 30px;">
+                                <i class="fas fa-info-circle me-2"></i> Learn More
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    @endif
 </section>
 
 <!-- ── Quick Portal Access ── -->
@@ -280,8 +336,8 @@
                     <div class="val-prop-icon">
                         <i class="fas fa-award"></i>
                     </div>
-                    <h4>Outcome-Based Methodology</h4>
-                    <p class="text-muted mb-0">All our courses (Survival, NextGen, Business English) target key benchmark test score improvements and lecture comprehension success.</p>
+                    <h4>{{ $settings['value_1_title'] }}</h4>
+                    <p class="text-muted mb-0">{{ $settings['value_1_description'] }}</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -289,8 +345,8 @@
                     <div class="val-prop-icon">
                         <i class="fas fa-chalkboard-user"></i>
                     </div>
-                    <h4>Personalized Advising</h4>
-                    <p class="text-muted mb-0">Students gain access to our custom Language Advising Service and student-led Peer Teaching systems to tackle individual language barriers.</p>
+                    <h4>{{ $settings['value_2_title'] }}</h4>
+                    <p class="text-muted mb-0">{{ $settings['value_2_description'] }}</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -298,8 +354,8 @@
                     <div class="val-prop-icon">
                         <i class="fas fa-laptop-house"></i>
                     </div>
-                    <h4>Anytime Anywhere Portal</h4>
-                    <p class="text-muted mb-0">Learn on-campus or practice on-the-go with our digital Self-access quiz panels and extensive study materials repositories.</p>
+                    <h4>{{ $settings['value_3_title'] }}</h4>
+                    <p class="text-muted mb-0">{{ $settings['value_3_description'] }}</p>
                 </div>
             </div>
         </div>
@@ -317,19 +373,19 @@
             <div class="col-lg-4">
                 <div class="about-card">
                     <h5><i class="fas fa-graduation-cap"></i> Our Identity</h5>
-                    <p class="text-muted mb-0">LEARN Academy is a premier English language learning institute. Designed to help students overcome reading, writing, and communication limitations, we offer high-end courses taught by accredited international experts. We operate with standard, rigorous criteria to ensure high GPA outputs and test success.</p>
+                    <p class="text-muted mb-0">{{ $settings['about_us_text'] }}</p>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="about-card">
                     <h5><i class="fas fa-bullseye"></i> Our Mission</h5>
-                    <p class="text-muted mb-0">Our mission is to deliver comprehensive, immersive, and engaging English language training modules. By providing personalized advising, self-access materials, and student-focused internship programs, we guide our candidates toward academic breakthrough, exam success, and bright professional careers.</p>
+                    <p class="text-muted mb-0">{{ $settings['mission'] }}</p>
                 </div>
             </div>
             <div class="col-lg-4">
                 <div class="about-card">
                     <h5><i class="fas fa-eye"></i> Our Vision</h5>
-                    <p class="text-muted mb-0">We envision becoming the premier national benchmark for language instruction. Through constant curriculum innovation and staff professional development programs, we produce students who excel at university, communicate fluently on the global stage, and lead business development projects.</p>
+                    <p class="text-muted mb-0">{{ $settings['vision'] }}</p>
                 </div>
             </div>
         </div>
@@ -344,33 +400,48 @@
             <p class="section-subtitle">Tour our state-of-the-art campus featuring modern tech-equipped classrooms and learning spaces.</p>
         </div>
         <div class="row g-3">
-            <div class="col-md-4">
-                <div class="facility-item">
-                    <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop" alt="Classroom">
-                    <div class="facility-overlay">
-                        <h5>Interactive Classrooms</h5>
-                        <p>Tech-equipped spaces designed for collaborative workshops and active lecturing.</p>
+            @forelse($gallery->take(3) as $item)
+                @php
+                    $imgPath = Str::startsWith($item->image_path, 'http') ? $item->image_path : asset($item->image_path);
+                @endphp
+                <div class="col-md-4">
+                    <div class="facility-item">
+                        <img src="{{ $imgPath }}" alt="{{ $item->title }}">
+                        <div class="facility-overlay">
+                            <h5>{{ $item->title }}</h5>
+                            <p>{{ $item->category }}</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="facility-item">
-                    <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=600&auto=format&fit=crop" alt="Library">
-                    <div class="facility-overlay">
-                        <h5>Self-Access Resource Center</h5>
-                        <p>Fully stocked digital library with grammar worksheets, mock exams, and quiz portals.</p>
+            @empty
+                <div class="col-md-4">
+                    <div class="facility-item">
+                        <img src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop" alt="Classroom">
+                        <div class="facility-overlay">
+                            <h5>Interactive Classrooms</h5>
+                            <p>Tech-equipped spaces designed for collaborative workshops and active lecturing.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="facility-item">
-                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop" alt="Computer Lab">
-                    <div class="facility-overlay">
-                        <h5>Multimedia Lab</h5>
-                        <p>Computer suites featuring specialized pronunciation software and recording tools.</p>
+                <div class="col-md-4">
+                    <div class="facility-item">
+                        <img src="https://images.unsplash.com/photo-1521587760476-6c12a4b040da?q=80&w=600&auto=format&fit=crop" alt="Library">
+                        <div class="facility-overlay">
+                            <h5>Self-Access Resource Center</h5>
+                            <p>Fully stocked digital library with grammar worksheets, mock exams, and quiz portals.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="col-md-4">
+                    <div class="facility-item">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600&auto=format&fit=crop" alt="Computer Lab">
+                        <div class="facility-overlay">
+                            <h5>Multimedia Lab</h5>
+                            <p>Computer suites featuring specialized pronunciation software and recording tools.</p>
+                        </div>
+                    </div>
+                </div>
+            @endforelse
         </div>
         
         <!-- Maps / Location -->
@@ -401,39 +472,56 @@
             <p class="section-subtitle">Catch up on recent updates, seminar highlights, and student events at LEARN Academy.</p>
         </div>
         <div class="row g-4">
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm rounded-3">
-                    <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=400&auto=format&fit=crop" class="card-img-top" alt="English Speaking Contest">
-                    <div class="card-body">
-                        <small class="text-warning fw-bold text-uppercase" style="font-size:0.75rem;">Contest</small>
-                        <h5 class="fw-bold mt-2 mb-3 text-primary">Annual Public Speaking Contest 2026</h5>
-                        <p class="text-muted small">Over 50 candidates from our Business English and Advanced Academic Writing courses competed for the Grand Trophy.</p>
-                        <a href="{{ route('events') }}" class="text-primary fw-semibold small text-decoration-none">Read more <i class="fas fa-arrow-right ms-1"></i></a>
+            @forelse($news as $article)
+                @php
+                    $newsImg = $article->image_path ? (Str::startsWith($article->image_path, 'http') ? $article->image_path : asset($article->image_path)) : 'https://images.unsplash.com/photo-1511556532299-8f662fc26c06?q=80&w=400&auto=format&fit=crop';
+                @endphp
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-3">
+                        <img src="{{ $newsImg }}" class="card-img-top" alt="{{ $article->title }}" style="height: 200px; object-fit: cover;">
+                        <div class="card-body">
+                            <small class="text-warning fw-bold text-uppercase" style="font-size:0.75rem;">{{ $article->category }}</small>
+                            <h5 class="fw-bold mt-2 mb-3 text-primary">{{ $article->title }}</h5>
+                            <p class="text-muted small">{{ Str::limit(strip_tags($article->content), 120) }}</p>
+                            <a href="{{ route('events') }}#article-{{ $article->id }}" class="text-primary fw-semibold small text-decoration-none">Read more <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm rounded-3">
-                    <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=400&auto=format&fit=crop" class="card-img-top" alt="Guest Lecture">
-                    <div class="card-body">
-                        <small class="text-warning fw-bold text-uppercase" style="font-size:0.75rem;">Workshop</small>
-                        <h5 class="fw-bold mt-2 mb-3 text-primary">Academic Writing Seminar by Prof. Henderson</h5>
-                        <p class="text-muted small">A specialized workshop focusing on dissertation thesis structure, citation formatting, and grammar styles.</p>
-                        <a href="{{ route('events') }}" class="text-primary fw-semibold small text-decoration-none">Read more <i class="fas fa-arrow-right ms-1"></i></a>
+            @empty
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-3">
+                        <img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=400&auto=format&fit=crop" class="card-img-top" alt="English Speaking Contest">
+                        <div class="card-body">
+                            <small class="text-warning fw-bold text-uppercase" style="font-size:0.75rem;">Contest</small>
+                            <h5 class="fw-bold mt-2 mb-3 text-primary">Annual Public Speaking Contest 2026</h5>
+                            <p class="text-muted small">Over 50 candidates from our Business English and Advanced Academic Writing courses competed for the Grand Trophy.</p>
+                            <a href="{{ route('events') }}" class="text-primary fw-semibold small text-decoration-none">Read more <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm rounded-3">
-                    <img src="https://images.unsplash.com/photo-1511556532299-8f662fc26c06?q=80&w=400&auto=format&fit=crop" class="card-img-top" alt="Rebranding ceremony">
-                    <div class="card-body">
-                        <small class="text-warning fw-bold text-uppercase" style="font-size:0.75rem;">Ceremony</small>
-                        <h5 class="fw-bold mt-2 mb-3 text-primary">Grand Rebranding & Campus Launch</h5>
-                        <p class="text-muted small">Inauguration ceremony showcasing our newly designed classrooms, self-access learning centers, and placement platforms.</p>
-                        <a href="{{ route('events') }}" class="text-primary fw-semibold small text-decoration-none">Read more <i class="fas fa-arrow-right ms-1"></i></a>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-3">
+                        <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=400&auto=format&fit=crop" class="card-img-top" alt="Guest Lecture">
+                        <div class="card-body">
+                            <small class="text-warning fw-bold text-uppercase" style="font-size:0.75rem;">Workshop</small>
+                            <h5 class="fw-bold mt-2 mb-3 text-primary">Academic Writing Seminar by Prof. Henderson</h5>
+                            <p class="text-muted small">A specialized workshop focusing on dissertation thesis structure, citation formatting, and grammar styles.</p>
+                            <a href="{{ route('events') }}" class="text-primary fw-semibold small text-decoration-none">Read more <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm rounded-3">
+                        <img src="https://images.unsplash.com/photo-1511556532299-8f662fc26c06?q=80&w=400&auto=format&fit=crop" class="card-img-top" alt="Rebranding ceremony">
+                        <div class="card-body">
+                            <small class="text-warning fw-bold text-uppercase" style="font-size:0.75rem;">Ceremony</small>
+                            <h5 class="fw-bold mt-2 mb-3 text-primary">Grand Rebranding & Campus Launch</h5>
+                            <p class="text-muted small">Inauguration ceremony showcasing our newly designed classrooms, self-access learning centers, and placement platforms.</p>
+                            <a href="{{ route('events') }}" class="text-primary fw-semibold small text-decoration-none">Read more <i class="fas fa-arrow-right ms-1"></i></a>
+                        </div>
+                    </div>
+                </div>
+            @endforelse
         </div>
     </div>
 </section>
@@ -486,7 +574,7 @@
                                 <textarea class="form-control" id="message" name="message" rows="4" required placeholder="Type your inquiry details here..."></textarea>
                             </div>
                             <div class="col-12 mt-4">
-                                <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold" style="background-color:var(--primary); border:none; border-radius:12px;">
+                                <button type="submit" class="btn btn-primary btn-lg w-100 py-3 fw-bold border-0" style="background-color:var(--primary); border-radius:12px;">
                                     <i class="fas fa-paper-plane me-2"></i> Submit Inquiry
                                 </button>
                             </div>
@@ -497,13 +585,4 @@
         </div>
     </div>
 </section>
-@endsection
-
-@section('scripts')
-<script>
-    document.getElementById('contactForm').addEventListener('submit', function(e) {
-        // Form relies on standard Laravel submission, which is already configured
-        // We will show a sweetalert if session indicates success. But we can also let bootstrap show standard alert.
-    });
-</script>
 @endsection
